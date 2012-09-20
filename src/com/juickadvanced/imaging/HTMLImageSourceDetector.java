@@ -9,7 +9,12 @@ package com.juickadvanced.imaging;
  */
 public class HTMLImageSourceDetector {
     public static boolean isHTMLImageSource0(String url) {
-        if (url.indexOf("gelbooru.com/") != -1) return true;
+        if (url.indexOf("gelbooru.com/") != -1) {
+            if (url.contains("&s=list")) {
+                return false;
+            }
+            return true;
+        }
         return false;
     }
 }

@@ -17,7 +17,7 @@ public class ImageURLConvertor {
                 url += ".png";
             }
         }
-        if (url.indexOf("%") != 1) {
+        if (url.indexOf("%") != -1) {
             return URIUtils.decode(url);
         }
         return url;
