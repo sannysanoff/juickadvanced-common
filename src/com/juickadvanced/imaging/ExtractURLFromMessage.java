@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class ExtractURLFromMessage {
-    public static Pattern urlPattern = Pattern.compile("((?<=\\A)|(?<=\\s))(ht|f)tps?://[a-z0-9\\-\\.]+[a-z]{2,}/?[^\\s\\n]*", Pattern.CASE_INSENSITIVE);
+    public static Pattern urlPattern = Pattern.compile("((?<=\\A)|(?<=<)|(?<=\\s))(ht|f)tps?://[a-z0-9\\-\\.]+[a-z]{2,}/?[^\\s\\n>]*", Pattern.CASE_INSENSITIVE);
 
     public static class FoundURL {
         String url;
