@@ -16,10 +16,13 @@ public class ClientToServer implements Serializable {
     String sessionId;
 
     Login login;
+    RemoveSession removeSession;
     SendMessage sendMessage;
     Poll poll;
     ConfirmPoll confirmPoll;
     Disconnect disconnect;
+    SubscribeToComments subscribeToComments;
+    SubscribeToThread subscribeToThread;
 
     public ClientToServer(String sessionId) {
         this.sessionId = sessionId;
@@ -37,35 +40,50 @@ public class ClientToServer implements Serializable {
         return sessionId;
     }
 
-    public void setLogin(Login login) {
-        this.login = login;
-    }
-
     public void setSendMessage(SendMessage sendMessage) {
         this.sendMessage = sendMessage;
     }
 
+    public void setDisconnect(Disconnect disconnect) {
+        this.disconnect = disconnect;
+    }
+
+    public void setLogin(Login login) {
+        this.login = login;
+    }
+
+
     public Poll getPoll() {
         return poll;
+    }
+
+
+    public ConfirmPoll getConfirmPoll() {
+        return confirmPoll;
+    }
+
+
+    public Disconnect getDisconnect() {
+        return disconnect;
+    }
+
+    public SubscribeToComments getSubscribeToComments() {
+        return subscribeToComments;
+    }
+
+    public SubscribeToThread getSubscribeToThread() {
+        return subscribeToThread;
+    }
+
+    public RemoveSession getRemoveSession() {
+        return removeSession;
     }
 
     public void setPoll(Poll poll) {
         this.poll = poll;
     }
 
-    public ConfirmPoll getConfirmPoll() {
-        return confirmPoll;
-    }
-
     public void setConfirmPoll(ConfirmPoll confirmPoll) {
         this.confirmPoll = confirmPoll;
-    }
-
-    public Disconnect getDisconnect() {
-        return disconnect;
-    }
-
-    public void setDisconnect(Disconnect disconnect) {
-        this.disconnect = disconnect;
     }
 }

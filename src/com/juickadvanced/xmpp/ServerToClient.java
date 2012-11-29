@@ -25,6 +25,7 @@ public class ServerToClient {
     ArrayList<TimestampedMessage> incomingMessages;
 
     public final static String NO_SUCH_SESSION = "No such session";
+    public final static String NON_LOCAL_SESSION = "Non-local session passed in JA request";
     public final static String NETWORK_CONNECT_ERROR = "Connect error: ";
 
     /**
