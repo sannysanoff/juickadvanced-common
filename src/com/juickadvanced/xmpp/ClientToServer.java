@@ -23,6 +23,7 @@ public class ClientToServer implements Serializable {
     Disconnect disconnect;
     SubscribeToComments subscribeToComments;
     SubscribeToThread subscribeToThread;
+    SubscribeToAll subscribeToAll;
 
     public ClientToServer(String sessionId) {
         this.sessionId = sessionId;
@@ -85,5 +86,13 @@ public class ClientToServer implements Serializable {
 
     public void setConfirmPoll(ConfirmPoll confirmPoll) {
         this.confirmPoll = confirmPoll;
+    }
+
+    public SubscribeToAll getSubscribeToAll() {
+        return subscribeToAll;
+    }
+
+    public void setSubscribeToAll(SubscribeToAll subscribeToAll) {
+        this.subscribeToAll = subscribeToAll;
     }
 }

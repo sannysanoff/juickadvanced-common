@@ -18,7 +18,6 @@ public class JuickPlainTextMessages {
         sb.append("#"+mid+"/"+rid);
         sb.append(" ");
         sb.append("http://juick.com/"+mid+"#"+rid+"\n");
-        System.out.println("Enter broadcast reply LAST");
         return sb.toString();
     }
 
