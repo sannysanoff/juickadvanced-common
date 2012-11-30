@@ -22,6 +22,7 @@ public class ClientToServer implements Serializable {
     ConfirmPoll confirmPoll;
     Disconnect disconnect;
     SubscribeToComments subscribeToComments;
+    SendGCMRegistration sendGCMRegistration;
     SubscribeToThread subscribeToThread;
     SubscribeToAll subscribeToAll;
 
@@ -94,5 +95,13 @@ public class ClientToServer implements Serializable {
 
     public void setSubscribeToAll(SubscribeToAll subscribeToAll) {
         this.subscribeToAll = subscribeToAll;
+    }
+
+    public SendGCMRegistration getSendGCMRegistration() {
+        return sendGCMRegistration;
+    }
+
+    public void setSendGCMRegistration(SendGCMRegistration sendGCMRegistration) {
+        this.sendGCMRegistration = sendGCMRegistration;
     }
 }
