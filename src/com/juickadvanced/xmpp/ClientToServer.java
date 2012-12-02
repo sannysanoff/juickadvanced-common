@@ -104,4 +104,8 @@ public class ClientToServer implements Serializable {
     public void setSendGCMRegistration(SendGCMRegistration sendGCMRegistration) {
         this.sendGCMRegistration = sendGCMRegistration;
     }
+
+    public void setSubscribeToThread(SubscribeToThread subscribeToThread) {
+        this.subscribeToThread = subscribeToThread;
+    }
 }
