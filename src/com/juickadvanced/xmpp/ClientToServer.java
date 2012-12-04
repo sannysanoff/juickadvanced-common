@@ -108,4 +108,8 @@ public class ClientToServer implements Serializable {
     public void setSubscribeToThread(SubscribeToThread subscribeToThread) {
         this.subscribeToThread = subscribeToThread;
     }
+
+    public void setSubscribeToComments(SubscribeToComments subscribeToComments) {
+        this.subscribeToComments = subscribeToComments;
+    }
 }

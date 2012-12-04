@@ -27,6 +27,8 @@ public class ServerToClient {
     public final static String NO_SUCH_SESSION = "No such session";
     public final static String NON_LOCAL_SESSION = "Non-local session passed in JA request";
     public final static String NETWORK_CONNECT_ERROR = "Connect error: ";
+    public final static String USAGE_NOT_PROVED = "Your account is not proved with given details.";
+    public final static String USAGE_CANNOT_BE_PROVED_NOW = "Your account could not be proved due to error on the remote site.";
 
     /**
      * error constructor
