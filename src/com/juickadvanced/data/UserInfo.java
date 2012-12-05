@@ -18,9 +18,9 @@ public class UserInfo implements Serializable {
 
     public static final String INFO_FIRST_MESSAGE = "First activity";
     public static final String INFO_LAST_MESSAGE = "Last activity";
-    public static final String INFO_MESSAGES_TOTAL = "Total message";
-    public static final String INFO_COMMENTS_TOTAL = "Total comments";
-    public static final String INFO_WEEK_ACTIVITY = "Last week msg/comm";
+    public static final String INFO_MESSAGES_TOTAL = "Total messages count";
+    public static final String INFO_COMMENTS_TOTAL = "Total comments count";
+    public static final String INFO_WEEK_ACTIVITY = "Last week msg+comm";
     public static final String INFO_AVG_COMMENTS_POST = "Avg comments/post";
     public static final String INFO_AVG_POSTS_COMMENTED = "Avg posts commented";
     public static final String INFO_TOP_COMMENTERS = "They comm. user:";
@@ -34,7 +34,7 @@ public class UserInfo implements Serializable {
         translations.put(INFO_LAST_MESSAGE, "Последнее появление");
         translations.put(INFO_MESSAGES_TOTAL, "Всего мессаг");
         translations.put(INFO_COMMENTS_TOTAL, "Всего комментов");
-        translations.put(INFO_WEEK_ACTIVITY, "Активность за неделю, мессаг/комментов");
+        translations.put(INFO_WEEK_ACTIVITY, "Активность за неделю, мессаг+комментов");
         translations.put(INFO_AVG_COMMENTS_POST, "Среднее: комментов/пост");
         translations.put(INFO_AVG_POSTS_COMMENTED, "Среднее: постов с комментами");
         translations.put(INFO_TOP_COMMENTERS, "Его комментаторы");
