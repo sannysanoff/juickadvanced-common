@@ -19,6 +19,7 @@ package com.juickadvanced.data.juick;
 
 import com.juickadvanced.data.MessageID;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -28,7 +29,7 @@ import java.util.Vector;
  *
  * @author Ugnich Anton
  */
-public class JuickMessage {
+public class JuickMessage implements Serializable {
 
     private MessageID MID = null;
     private int RID = 0;

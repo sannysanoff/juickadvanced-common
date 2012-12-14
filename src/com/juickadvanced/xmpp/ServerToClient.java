@@ -1,8 +1,6 @@
 package com.juickadvanced.xmpp;
 
-import com.juickadvanced.xmpp.messages.ContactOffline;
-import com.juickadvanced.xmpp.messages.ContactOnline;
-import com.juickadvanced.xmpp.messages.TimestampedMessage;
+import com.juickadvanced.xmpp.messages.*;
 
 import java.util.ArrayList;
 
@@ -23,6 +21,9 @@ public class ServerToClient {
     ArrayList<ContactOffline> contactOffline;
     ArrayList<ContactOnline> contactOnline;
     ArrayList<TimestampedMessage> incomingMessages;
+    PingFromServer pingFromServer;
+    PongFromServer pongFromServer;
+    NewInfoNotification newInfoNotification;
 
     public final static String NO_SUCH_SESSION = "No such session";
     public final static String NON_LOCAL_SESSION = "Non-local session passed in JA request";
@@ -85,5 +86,33 @@ public class ServerToClient {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public PingFromServer getPingFromServer() {
+        return pingFromServer;
+    }
+
+    public void setPingFromServer(PingFromServer pingFromServer) {
+        this.pingFromServer = pingFromServer;
+    }
+
+    public PongFromServer getPongFromServer() {
+        return pongFromServer;
+    }
+
+    public void setPongFromServer(PongFromServer pongFromServer) {
+        this.pongFromServer = pongFromServer;
+    }
+
+    public boolean isHaveMoreMessages() {
+        return haveMoreMessages;
+    }
+
+    public NewInfoNotification getNewInfoNotification() {
+        return newInfoNotification;
+    }
+
+    public void setNewInfoNotification(NewInfoNotification newInfoNotification) {
+        this.newInfoNotification = newInfoNotification;
     }
 }

@@ -25,6 +25,11 @@ public class ClientToServer implements Serializable {
     SendGCMRegistration sendGCMRegistration;
     SubscribeToThread subscribeToThread;
     SubscribeToAll subscribeToAll;
+    PingFromClient pingFromClient;
+    PongFromClient pongFromClient;
+    WillSynchronize willSynchronize;
+    String connectivityInfo;
+    String connectivityInfoStatistics;
 
     public ClientToServer(String sessionId) {
         this.sessionId = sessionId;
@@ -111,5 +116,51 @@ public class ClientToServer implements Serializable {
 
     public void setSubscribeToComments(SubscribeToComments subscribeToComments) {
         this.subscribeToComments = subscribeToComments;
+    }
+
+    public PingFromClient getPingFromClient() {
+        return pingFromClient;
+    }
+
+    public void setPingFromClient(PingFromClient pingFromClient) {
+        this.pingFromClient = pingFromClient;
+    }
+
+    public PongFromClient getPongFromClient() {
+        return pongFromClient;
+    }
+
+    public void setPongFromClient(PongFromClient pongFromClient) {
+        this.pongFromClient = pongFromClient;
+    }
+
+    public static ClientToServer createPing(String sessionId) {
+        ClientToServer clientToServer = new ClientToServer(sessionId);
+        clientToServer.setPingFromClient(new PingFromClient(System.currentTimeMillis()));
+        return clientToServer;
+    }
+
+    public WillSynchronize getWillSynchronize() {
+        return willSynchronize;
+    }
+
+    public void setWillSynchronize(WillSynchronize willSynchronize) {
+        this.willSynchronize = willSynchronize;
+    }
+
+    public String getConnectivityInfo() {
+        return connectivityInfo;
+    }
+
+    public void setConnectivityInfo(String connectivityInfo) {
+        this.connectivityInfo = connectivityInfo;
+    }
+
+    public String getConnectivityInfoStatistics() {
+        return connectivityInfoStatistics;
+    }
+
+    public void setConnectivityInfoStatistics(String connectivityInfoStatistics) {
+        this.connectivityInfoStatistics = connectivityInfoStatistics;
     }
 }

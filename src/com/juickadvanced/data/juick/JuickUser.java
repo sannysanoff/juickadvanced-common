@@ -18,11 +18,13 @@
 package com.juickadvanced.data.juick;
 
 
+import java.io.Serializable;
+
 /**
  *
  * @author Ugnich Anton
  */
-public class JuickUser {
+public class JuickUser implements Serializable {
 
     public int UID = 0;
     public String UName = null;
