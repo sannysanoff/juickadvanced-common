@@ -89,11 +89,11 @@ public class JuickMessage implements Serializable {
     }
 
     protected String webLinkToMessage(String msg) {
-        msg += MID.toString();
+        msg += "#"+((JuickMessageID)MID).getMid();
         if (RID > 0) {
             msg += "/" + RID;
         }
-        msg += " http://juick.com/" + MID;
+        msg += " http://juick.com/" + ((JuickMessageID)MID).getMid();
         if (RID > 0) {
             msg += "#" + RID;
         }

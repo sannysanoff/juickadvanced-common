@@ -10,6 +10,7 @@ package com.juickadvanced.xmpp.messages;
 public class PongFromServer {
     long ts;
     boolean shouldResetConnectionStatistics;
+    int adjustSleepInterval;     // minutes
 
     public PongFromServer(long ts) {
         this.ts = ts;
@@ -21,5 +22,13 @@ public class PongFromServer {
 
     public void setShouldResetConnectionStatistics(boolean shouldResetConnectionStatistics) {
         this.shouldResetConnectionStatistics = shouldResetConnectionStatistics;
+    }
+
+    public int getAdjustSleepInterval() {
+        return adjustSleepInterval;
+    }
+
+    public void setAdjustSleepInterval(int adjustSleepInterval) {
+        this.adjustSleepInterval = adjustSleepInterval;
     }
 }

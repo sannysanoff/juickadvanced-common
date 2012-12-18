@@ -21,9 +21,13 @@ public class JuickPlainTextMessages {
         return sb.toString();
     }
 
-    public static String createMessagePlainText(Object mid, String userName, String body) {
+    public static String createMessagePlainText(Object mid, String userName, String body, String[] tagsS) {
         StringBuilder sb = new StringBuilder();
-        sb.append("@"+userName+":\n");
+        sb.append("@"+userName+":");
+        for(int i=0; i<tagsS.length; i++) {
+            sb.append(" *"+tagsS[i]);
+        }
+        sb.append("\n");
         sb.append(body);
         sb.append("\n");
         sb.append("#"+mid);
