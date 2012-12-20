@@ -10,7 +10,11 @@ package com.juickadvanced.imaging;
 public class ImageURLConvertor {
     public static String convertURLToDownloadable(String url) {
         if (url.indexOf("www.dropbox.com/") != -1 && url.indexOf("dl=1") == -1) {
-            url += "&dl=1";
+            if (url.indexOf("?") != -1) {
+                url += "&dl=1";
+            } else {
+                url += "?dl=1";
+            }
         }
         if (url.indexOf("gyazo.com/") != -1) {
             if (url.lastIndexOf(".") < url.length() - 10) {

@@ -14,6 +14,10 @@ public class ValidImageURLDetector {
         if (args != -1) {
             urlLower = urlLower.substring(0, args);
         }
+        args = urlLower.indexOf("&");       // dropbox? without "?"
+        if (args != -1) {
+            urlLower = urlLower.substring(0, args);
+        }
         if (urlLower.contains("img-fotki.yandex.ru/get") && urlLower.endsWith("orig"))
             return true;
         if (urlLower.contains("http://commons.wikimedia.org/wiki/file:"))

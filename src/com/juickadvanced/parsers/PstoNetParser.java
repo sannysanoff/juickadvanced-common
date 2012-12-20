@@ -34,10 +34,6 @@ public class PstoNetParser {
     static Pattern messageID = Pattern.compile("<div class=\"post-id\"><a href=\"(.*)\">#(.*)</a></div>");
     static Pattern nreplies = Pattern.compile("title=\"Add comment\"><img src=\"/img/reply.png\" alt=\"re\"/>(.*)</a>");
     static Pattern nrepliesRU = Pattern.compile("title=\"Добавить комментарий\"><img src=\"/img/reply.png\" alt=\"re\"/>(.*)</a>");
-    static SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-    static {
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
     public static ArrayList<JuickMessage> badRetval = new ArrayList<JuickMessage>();
 
     public enum ParseMode {
@@ -47,13 +43,17 @@ public class PstoNetParser {
     }
 
     public ArrayList<JuickMessage> parseWebMessageListPure(String jsonStr, ParseMode parseMode) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         ArrayList<JuickMessage> retval = new ArrayList<JuickMessage>();
         String[] lines = jsonStr.split("\n");
         JuickMessage message = null;
         //
         // YES! I CAN USE REGEXPS to parse HTML!
         //
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        if (!jsonStr.contains("logout-link")) {
+            // non-logged-in sees GMT times
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        }
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
             line = line.trim();
@@ -122,6 +122,10 @@ public class PstoNetParser {
                         }
                     }
                     line = sb.toString();
+                }
+                if (parseMode == ParseMode.PARSE_THREAD_FIRST && message.Text != null) {
+                    // this is probably recommendation txt
+                    continue;
                 }
                 if (!line.endsWith("</p>")) {
                     return badRetval;
