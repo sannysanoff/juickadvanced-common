@@ -20,11 +20,13 @@ public class Login implements Serializable {
     String proofAccountId;
     String proofAccountToken;
     String proofAccountType;
+    String version;
 
-    public Login(XMPPConnectionSetup connectionSetup, HashSet<String> watchedJids, String gcmId) {
+    public Login(XMPPConnectionSetup connectionSetup, HashSet<String> watchedJids, String gcmId, String version) {
         this.connectionSetup = connectionSetup;
         this.gcmId = gcmId;
         this.watchedJids = watchedJids;
+        this.version = version;
     }
 
     public String getProofAccountId() {
@@ -65,5 +67,9 @@ public class Login implements Serializable {
 
     public HashSet<String> getWatchedJids() {
         return watchedJids;
+    }
+
+    public String getVersion() {
+        return version;
     }
 }

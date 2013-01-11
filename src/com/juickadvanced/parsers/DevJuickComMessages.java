@@ -49,6 +49,7 @@ public class DevJuickComMessages {
 
     public static ArrayList<JuickMessage> parseWebPage(String htmlStr) {
         ArrayList<JuickMessage> retval = new ArrayList<JuickMessage>();
+        htmlStr = htmlStr.replace("</div>","</div>\n");
         String[] lines = htmlStr.split("\n");
         State state = State.WAIT_MESSAGE_START;
         JuickMessage message = null;
@@ -117,8 +118,12 @@ public class DevJuickComMessages {
                         }
                     }
                     if (line.contains(messageBodyStart)) {
+                        int endIndex = line.indexOf(messageBodyEnd);
+                        if (endIndex != -1) {
+                            line = line.substring(0, endIndex);
+                        }
                         message.Text = line.substring(line.indexOf(messageBodyStart)+messageBodyStart.length());
-                        if (line.contains(messageBodyEnd)) {
+                        if (endIndex != -1) {
                             retval.add(message);
                             state = State.WAIT_MESSAGE_START;   // quickly ended
                         } else {
@@ -128,7 +133,7 @@ public class DevJuickComMessages {
                     break;
                 case IN_MESSAGE_TEXT:
                     if (line.contains(messageBodyEnd)) {
-                        message.Text += line.replace(messageBodyEnd,"");
+                        message.Text += line.substring(0, line.indexOf(messageBodyEnd));
                         retval.add(message);
                         state = State.WAIT_MESSAGE_START;
                     } else {
@@ -148,7 +153,12 @@ public class DevJuickComMessages {
         while(true) {
             Matcher matcher = hyperlink.matcher(text);
             if (matcher.find()) {
-                text = matcher.replaceFirst(matcher.group(2));
+                try {
+                    text = matcher.replaceFirst(matcher.group(2));
+                } catch (Exception e) {
+                    // bugs in regexp?
+                    break;
+                }
                 continue;
             } else {
                 break;
@@ -158,7 +168,12 @@ public class DevJuickComMessages {
         while(true) {
             Matcher matcher = blockQuote.matcher(text);
             if (matcher.find()) {
-                text = matcher.replaceFirst("> " + matcher.group(1));
+                try {
+                    text = matcher.replaceFirst("> " + matcher.group(1));
+                } catch (Exception e) {
+                    // bugs in regexp?
+                    break;
+                }
                 continue;
             } else {
                 break;
@@ -167,7 +182,12 @@ public class DevJuickComMessages {
         while(true) {
             Matcher matcher = bold.matcher(text);
             if (matcher.find()) {
-                text = matcher.replaceFirst("*" + matcher.group(1)+"*");
+                try {
+                    text = matcher.replaceFirst("*" + matcher.group(1)+"*");
+                } catch (Exception e) {
+                    // bugs in regexp?
+                    break;
+                }
                 continue;
             } else {
                 break;
@@ -176,7 +196,12 @@ public class DevJuickComMessages {
         while(true) {
             Matcher matcher = italic.matcher(text);
             if (matcher.find()) {
-                text = matcher.replaceFirst("/" + matcher.group(1)+"/");
+                try {
+                    text = matcher.replaceFirst("/" + matcher.group(1)+"/");
+                } catch (Exception e) {
+                    // bugs in regexp?
+                    break;
+                }
                 continue;
             } else {
                 break;
@@ -185,7 +210,12 @@ public class DevJuickComMessages {
         while(true) {
             Matcher matcher = underline.matcher(text);
             if (matcher.find()) {
-                text = matcher.replaceFirst("_" + matcher.group(1)+"_");
+                try {
+                    text = matcher.replaceFirst("_" + matcher.group(1)+"_");
+                } catch (Exception e) {
+                    // bugs in regexp?
+                    break;
+                }
                 continue;
             } else {
                 break;
