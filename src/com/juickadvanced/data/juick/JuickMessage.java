@@ -49,6 +49,10 @@ public class JuickMessage implements Serializable {
     transient public String continuationInformation;
     transient public long messageSaveDate;
     transient public Object parsedText;
+    public JuickMessage contextPost;      // parent post
+    public JuickMessage contextReply;     // parent reply
+    public int myFoundCount;
+    public int hisFoundCount;
 
     public JuickMessage() {
     }

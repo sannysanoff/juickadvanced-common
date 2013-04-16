@@ -27,7 +27,7 @@ public class XMPPConnectionSetup implements Serializable {
     public XMPPConnectionSetup(String jid, String password, int port, int priority, String resource, String server, boolean secure) {
         this.password = password;
         this.port = port;
-        this.jid = jid;
+        this.jid = jid.replace(" ","");
         this.priority = priority;
         this.resource = resource;
         this.server = server;
