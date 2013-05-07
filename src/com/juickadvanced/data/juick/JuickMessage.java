@@ -38,6 +38,7 @@ public class JuickMessage implements Serializable {
     public JuickUser User = null;
     public Vector<String> tags = new Vector<String>();
     public Date Timestamp = null;
+    public long deltaTime = Long.MIN_VALUE;
     public int replies = 0;
     public String Photo = null;
     public String Video = null;
