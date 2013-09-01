@@ -27,6 +27,7 @@ public class ClientToServer implements Serializable {
     SubscribeToAll subscribeToAll;
     PingFromClient pingFromClient;
     PongFromClient pongFromClient;
+    SetupSubscriptions setupSubscriptions;
     WillSynchronize willSynchronize;
     String connectivityInfo;
     String connectivityInfoStatistics;
@@ -162,5 +163,13 @@ public class ClientToServer implements Serializable {
 
     public void setConnectivityInfoStatistics(String connectivityInfoStatistics) {
         this.connectivityInfoStatistics = connectivityInfoStatistics;
+    }
+
+    public SetupSubscriptions getSetupSubscriptions() {
+        return setupSubscriptions;
+    }
+
+    public void setSetupSubscriptions(SetupSubscriptions setupSubscriptions) {
+        this.setupSubscriptions = setupSubscriptions;
     }
 }

@@ -17,6 +17,7 @@ public class ServerToClient {
     public long timestamp;
     String errorMessage;
     public boolean haveMoreMessages;
+    public boolean logreq;
 
     ArrayList<ContactOffline> contactOffline;
     ArrayList<ContactOnline> contactOnline;
@@ -114,5 +115,14 @@ public class ServerToClient {
 
     public void setNewInfoNotification(NewInfoNotification newInfoNotification) {
         this.newInfoNotification = newInfoNotification;
+    }
+
+
+    public boolean getLogreq() {
+        return logreq;
+    }
+
+    public void setLogreq(boolean logreq) {
+        this.logreq = logreq;
     }
 }

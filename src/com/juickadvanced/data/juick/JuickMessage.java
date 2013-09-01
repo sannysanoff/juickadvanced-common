@@ -46,10 +46,13 @@ public class JuickMessage implements Serializable {
     public String source;
     public String microBlogCode;
     public boolean privateMessage;
+    public boolean read;        // already read
+    public int readComments;
 
     transient public String continuationInformation;
     transient public long messageSaveDate;
     transient public Object parsedText;
+    transient public Object parsedUI;
     public JuickMessage contextPost;      // parent post
     public JuickMessage contextReply;     // parent reply
     public int myFoundCount;
