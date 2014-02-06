@@ -22,6 +22,9 @@ public class ValidImageURLDetector {
             return true;
         if (urlLower.contains("http://commons.wikimedia.org/wiki/file:"))
             return false;
+        if (urlLower.endsWith(":large")) {
+            urlLower = urlLower.substring(0, urlLower.length() - 6);
+        }
         return urlLower.endsWith(".png") || urlLower.endsWith(".gif") || urlLower.endsWith(".jpg") || urlLower.endsWith(".jpeg");
     }
 }

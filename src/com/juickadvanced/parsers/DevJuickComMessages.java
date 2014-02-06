@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 public class DevJuickComMessages {
 
     static Pattern messageStart = Pattern.compile("<li id=\"msg-(\\d+)\"");
-    static Pattern messageTime = Pattern.compile("<div class=\"msg-ts\"><a href=\"(.*)\" title=\"(.*).0 GMT\">");
+    static Pattern messageTime = Pattern.compile("<div class=\"msg-ts\"><a href=\"(.*)\" title=\"(.*) GMT\">");
     static Pattern messageUser = Pattern.compile("<div class=\"msg-avatar\"><a href=\"/(.*)/\"><img src=\"//i.juick.com/a/(.*).png\" alt=");
     static Pattern messageHeader = Pattern.compile("<div class=\"msg-header\"><a href=");
     static Pattern nreplies = Pattern.compile("<div class=\"msg-comments\"><a href=\"(.*?)\">(\\d+) repl(.*)</a>");
@@ -50,96 +50,95 @@ public class DevJuickComMessages {
     public static ArrayList<JuickMessage> parseWebPage(String htmlStr) {
         ArrayList<JuickMessage> retval = new ArrayList<JuickMessage>();
         htmlStr = htmlStr.replace("</div>","</div>\n");
-        String[] lines = htmlStr.split("\n");
+        String[] lines = htmlStr.split("<li id=\"msg-");
         State state = State.WAIT_MESSAGE_START;
         JuickMessage message = null;
         //
         // YES! I CAN USE REGEXPS to parse HTML!
         //
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        for (String line : lines) {
-            switch (state) {
-                case WAIT_MESSAGE_START:
-                    Matcher matcher = messageStart.matcher(line);
-                    if (matcher.find()) {
-                        message = new JuickMessage();
-                        message.User = new JuickUser();
-                        message.setMID(new com.juickadvanced.data.juick.JuickMessageID(Integer.parseInt(matcher.group(1))));
-                        message.microBlogCode = JuickMessageID.CODE;
-                        state = State.WAIT_MSG_TEXT;
-                    }
-                    Matcher nrepliesMatcher = nreplies.matcher(line);
-                    if (nrepliesMatcher.find()) {
-                        retval.get(retval.size()-1).replies = Integer.parseInt(nrepliesMatcher.group(2));
-                    }
-                    Matcher mediaImageMatcher = mediaImage.matcher(line);
-                    if (mediaImageMatcher.find()) {
-                        String url = mediaImageMatcher.group(1);
-                        if (url.startsWith("//")) {
-                            url = "http:"+url;
-                        }
-                        retval.get(retval.size()-1).Text = url +"\n"+retval.get(retval.size()-1).Text;
-                    }
+        for (String _line : lines) {
+                String line = "<li id=\"msg-"+_line;
+                Matcher matcher = messageStart.matcher(line);
+                if (matcher.find()) {
+                    message = new JuickMessage();
+                    message.User = new JuickUser();
+                    message.setMID(new com.juickadvanced.data.juick.JuickMessageID(Integer.parseInt(matcher.group(1))));
+                    message.microBlogCode = JuickMessageID.CODE;
+                    retval.add(message);
+                    state = State.WAIT_MSG_TEXT;
+                } else {
                     continue;
-                case WAIT_MSG_TEXT:
-                    Matcher timeMatcher = messageTime.matcher(line);
-                    if (timeMatcher.find()) {
-                        try {
-                            message.Timestamp = sdf.parse(timeMatcher.group(2));
-                        } catch (ParseException e) {
-                            return badRetval;
-                        }
+                }
+                Matcher nrepliesMatcher = nreplies.matcher(line);
+                if (nrepliesMatcher.find()) {
+                    retval.get(retval.size()-1).replies = Integer.parseInt(nrepliesMatcher.group(2));
+                }
+                Matcher mediaImageMatcher = mediaImage.matcher(line);
+                if (mediaImageMatcher.find()) {
+                    String url = mediaImageMatcher.group(1);
+                    if (url.startsWith("//")) {
+                        url = "http:"+url;
                     }
-                    Matcher userMatcher = messageUser.matcher(line);
-                    if (userMatcher.find()) {
-                        try {
-                            message.User.UName = userMatcher.group(1);
-                            message.User.UID = Integer.parseInt(userMatcher.group(2));
-                        } catch (NumberFormatException e) {
-                            return badRetval;
-                        }
+                    retval.get(retval.size()-1).Text = url +"\n"+retval.get(retval.size()-1).Text;
+                }
+                Matcher timeMatcher = messageTime.matcher(line);
+                if (timeMatcher.find()) {
+                    try {
+                        message.Timestamp = sdf.parse(timeMatcher.group(2));
+                    } catch (ParseException e) {
+                        retval.remove(retval.size()-1);
+                        continue;
                     }
-                    if (messageHeader.matcher(line).find()) {
-                        try {
-                            message.tags = new Vector<String>();
-                            int star = line.indexOf("*");
+                }
+                Matcher userMatcher = messageUser.matcher(line);
+                if (userMatcher.find()) {
+                    try {
+                        message.User.UName = userMatcher.group(1);
+                        message.User.UID = Integer.parseInt(userMatcher.group(2));
+                    } catch (NumberFormatException e) {
+                        retval.remove(retval.size()-1);
+                        continue;
+                    }
+                }
+                if (messageHeader.matcher(line).find()) {
+                    try {
+                        message.tags = new Vector<String>();
+                        int lnx = line.indexOf("msg-tags");
+                        if (lnx != -1) {
+                            String ln = line.substring(lnx);
+                            int star = ln.indexOf("*");
                             if (star != -1) {
-                                line = line.substring(star);
-                                line = tags.matcher(line).replaceAll("").trim();
-                                String[] tagz = line.split(" ");
+                                ln = ln.substring(star);
+                                ln = tags.matcher(ln).replaceAll("").trim();
+                                String[] tagz = ln.split(" ");
                                 for (String s : tagz) {
                                     if (s.startsWith("*")) {
                                         message.tags.add(s.substring(1));
+                                    } else {
+                                        break;
                                     }
                                 }
                             }
-                        } catch (NumberFormatException e) {
-                            return badRetval;
                         }
+                    } catch (NumberFormatException e) {
+                        return badRetval;
                     }
-                    if (line.contains(messageBodyStart)) {
-                        int endIndex = line.indexOf(messageBodyEnd);
-                        if (endIndex != -1) {
-                            line = line.substring(0, endIndex);
-                        }
-                        message.Text = line.substring(line.indexOf(messageBodyStart)+messageBodyStart.length());
-                        if (endIndex != -1) {
-                            retval.add(message);
-                            state = State.WAIT_MESSAGE_START;   // quickly ended
-                        } else {
-                            state = State.IN_MESSAGE_TEXT;
-                        }
+                }
+                if (line.contains(messageBodyStart)) {
+                    String ln = line.substring(line.indexOf(messageBodyStart)+messageBodyStart.length());
+                    int endIndex = ln.indexOf(messageBodyEnd);
+                    if (endIndex != -1) {
+                        ln = ln.substring(0, endIndex);
                     }
-                    break;
-                case IN_MESSAGE_TEXT:
-                    if (line.contains(messageBodyEnd)) {
-                        message.Text += line.substring(0, line.indexOf(messageBodyEnd));
+                    message.Text = ln;
+                    if (endIndex != -1) {
                         retval.add(message);
-                        state = State.WAIT_MESSAGE_START;
+                        state = State.WAIT_MESSAGE_START;   // quickly ended
                     } else {
-                        message.Text += line;
+                        state = State.IN_MESSAGE_TEXT;
                     }
-            }
+                }
         }
         for (JuickMessage juickMessage : retval) {
             juickMessage.Text = unwebMessageText(juickMessage.Text);
