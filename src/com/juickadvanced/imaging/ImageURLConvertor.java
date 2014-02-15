@@ -1,5 +1,11 @@
 package com.juickadvanced.imaging;
 
+import com.juickadvanced.parsers.URLParser;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
 /**
  * Created with IntelliJ IDEA.
  * User: san
@@ -19,6 +25,16 @@ public class ImageURLConvertor {
         if (url.indexOf("gyazo.com/") != -1) {
             if (url.lastIndexOf(".") < url.length() - 10) {
                 url += ".png";
+            }
+        }
+        if (url.contains("i.point.im")) {
+            URLParser parser = new URLParser(url);
+            String nurl = parser.getArgsMap().get("u");
+            try {
+                String retval = URIUtils.decode(nurl);
+                return retval;
+            } catch (Exception e) {
+                //
             }
         }
         if (url.indexOf("%") != -1) {

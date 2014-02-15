@@ -10,13 +10,17 @@ package com.juickadvanced.imaging;
 public class ValidImageURLDetector {
     public static boolean isValidImageURL0(String urlLower) {
         if (urlLower.indexOf("http://gyazo.com") != -1) return true;
-        int args = urlLower.indexOf("?");
-        if (args != -1) {
-            urlLower = urlLower.substring(0, args);
-        }
-        args = urlLower.indexOf("&");       // dropbox? without "?"
-        if (args != -1) {
-            urlLower = urlLower.substring(0, args);
+        if (urlLower.startsWith("http://i.point.im/")) {
+            // dont check args
+        } else {
+            int args = urlLower.indexOf("?");
+            if (args != -1) {
+                urlLower = urlLower.substring(0, args);
+            }
+            args = urlLower.indexOf("&");       // dropbox? without "?"
+            if (args != -1) {
+                urlLower = urlLower.substring(0, args);
+            }
         }
         if (urlLower.contains("img-fotki.yandex.ru/get") && urlLower.endsWith("orig"))
             return true;

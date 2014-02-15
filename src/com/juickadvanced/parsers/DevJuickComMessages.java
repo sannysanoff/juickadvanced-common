@@ -11,6 +11,10 @@ import java.util.TimeZone;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jsoup.*;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,13 +25,6 @@ import java.util.regex.Pattern;
  */
 public class DevJuickComMessages {
 
-    static Pattern messageStart = Pattern.compile("<li id=\"msg-(\\d+)\"");
-    static Pattern messageTime = Pattern.compile("<div class=\"msg-ts\"><a href=\"(.*)\" title=\"(.*) GMT\">");
-    static Pattern messageUser = Pattern.compile("<div class=\"msg-avatar\"><a href=\"/(.*)/\"><img src=\"//i.juick.com/a/(.*).png\" alt=");
-    static Pattern messageHeader = Pattern.compile("<div class=\"msg-header\"><a href=");
-    static Pattern nreplies = Pattern.compile("<div class=\"msg-comments\"><a href=\"(.*?)\">(\\d+) repl(.*)</a>");
-    static Pattern mediaImage = Pattern.compile("<div class=\"msg-media\"><a href=\"(.*?)\">");
-    static String messageBodyStart = "<div class=\"msg-txt\">";
     static Pattern hyperlink = Pattern.compile("<a (.*?)href=\"(.*?)\"(.*?)>(.*?)</a>");
     static Pattern juick = Pattern.compile("http://juick.com/(\\d+)");
     static Pattern juick2 = Pattern.compile("http://juick.com/(\\w+)/(\\d+)");
@@ -36,10 +33,6 @@ public class DevJuickComMessages {
     static Pattern italic = Pattern.compile("<i>(.*?)</i>");
     static Pattern bold = Pattern.compile("<b>(.*?)</b>");
     static Pattern underline = Pattern.compile("<u>(.*?)</u>");
-    static String messageBodyEnd = "</div>";
-    static Pattern tags = Pattern.compile("<.*?>");
-    static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    static ArrayList<JuickMessage> badRetval = new ArrayList<JuickMessage>();
 
     enum State {
         WAIT_MESSAGE_START,
@@ -49,106 +42,54 @@ public class DevJuickComMessages {
 
     public static ArrayList<JuickMessage> parseWebPage(String htmlStr) {
         ArrayList<JuickMessage> retval = new ArrayList<JuickMessage>();
-        htmlStr = htmlStr.replace("</div>","</div>\n");
-        String[] lines = htmlStr.split("<li id=\"msg-");
-        State state = State.WAIT_MESSAGE_START;
-        JuickMessage message = null;
-        //
-        // YES! I CAN USE REGEXPS to parse HTML!
-        //
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-        for (String _line : lines) {
-                String line = "<li id=\"msg-"+_line;
-                Matcher matcher = messageStart.matcher(line);
-                if (matcher.find()) {
-                    message = new JuickMessage();
-                    message.User = new JuickUser();
-                    message.setMID(new com.juickadvanced.data.juick.JuickMessageID(Integer.parseInt(matcher.group(1))));
-                    message.microBlogCode = JuickMessageID.CODE;
-                    retval.add(message);
-                    state = State.WAIT_MSG_TEXT;
-                } else {
+        Document parsed = Jsoup.parse(htmlStr);
+        Elements elems = parsed.select("article");
+        if (elems != null) {
+            for (Element article : elems) {
+                String mid = article.attr("data-mid");
+                if (mid.length() == 0) continue;
+                JuickMessage msg = new JuickMessage();
+                msg.setMID(new JuickMessageID(Integer.parseInt(mid)));
+                Elements t = article.select("header.t");
+                Elements userpic = article.select("aside > a > img");
+                String[] userpicArr = userpic.attr("src").split("[/\\.]");
+                Elements link = t.select("a");
+                Elements time = t.select("time");
+                msg.User = new JuickUser();
+                msg.User.UName = link.attr("href").split("/")[1];
+                msg.User.UID = Integer.parseInt(userpicArr[6]);
+                msg.microBlogCode = JuickMessageID.CODE;
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    msg.Timestamp = sdf.parse(time.attr("datetime"));
+                } catch (ParseException e) {
                     continue;
                 }
-                Matcher nrepliesMatcher = nreplies.matcher(line);
-                if (nrepliesMatcher.find()) {
-                    retval.get(retval.size()-1).replies = Integer.parseInt(nrepliesMatcher.group(2));
+                msg.tags = new Vector<String>();
+                Elements tags = article.select("header.u > a");
+                for(int i=1; i<tags.size(); i++) {
+                    msg.tags.add(tags.get(i).text());
                 }
-                Matcher mediaImageMatcher = mediaImage.matcher(line);
-                if (mediaImageMatcher.find()) {
-                    String url = mediaImageMatcher.group(1);
-                    if (url.startsWith("//")) {
-                        url = "http:"+url;
-                    }
-                    retval.get(retval.size()-1).Text = url +"\n"+retval.get(retval.size()-1).Text;
+                Elements text = article.select("p");
+                StringBuilder sb = new StringBuilder();
+                for (Element element : text) {
+                    sb.append(element.toString());
                 }
-                Matcher timeMatcher = messageTime.matcher(line);
-                if (timeMatcher.find()) {
-                    try {
-                        message.Timestamp = sdf.parse(timeMatcher.group(2));
-                    } catch (ParseException e) {
-                        retval.remove(retval.size()-1);
-                        continue;
-                    }
-                }
-                Matcher userMatcher = messageUser.matcher(line);
-                if (userMatcher.find()) {
-                    try {
-                        message.User.UName = userMatcher.group(1);
-                        message.User.UID = Integer.parseInt(userMatcher.group(2));
-                    } catch (NumberFormatException e) {
-                        retval.remove(retval.size()-1);
-                        continue;
-                    }
-                }
-                if (messageHeader.matcher(line).find()) {
-                    try {
-                        message.tags = new Vector<String>();
-                        int lnx = line.indexOf("msg-tags");
-                        if (lnx != -1) {
-                            String ln = line.substring(lnx);
-                            int star = ln.indexOf("*");
-                            if (star != -1) {
-                                ln = ln.substring(star);
-                                ln = tags.matcher(ln).replaceAll("").trim();
-                                String[] tagz = ln.split(" ");
-                                for (String s : tagz) {
-                                    if (s.startsWith("*")) {
-                                        message.tags.add(s.substring(1));
-                                    } else {
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    } catch (NumberFormatException e) {
-                        return badRetval;
-                    }
-                }
-                if (line.contains(messageBodyStart)) {
-                    String ln = line.substring(line.indexOf(messageBodyStart)+messageBodyStart.length());
-                    int endIndex = ln.indexOf(messageBodyEnd);
-                    if (endIndex != -1) {
-                        ln = ln.substring(0, endIndex);
-                    }
-                    message.Text = ln;
-                    if (endIndex != -1) {
-                        retval.add(message);
-                        state = State.WAIT_MESSAGE_START;   // quickly ended
-                    } else {
-                        state = State.IN_MESSAGE_TEXT;
-                    }
-                }
-        }
-        for (JuickMessage juickMessage : retval) {
-            juickMessage.Text = unwebMessageText(juickMessage.Text);
+                msg.Text = unwebMessageTextJuickWeb(sb.toString());
+                System.out.println("ok");
+                retval.add(msg);
+            }
         }
         return retval;
     }
 
-    public static String unwebMessageText(String text) {
+    public static String unwebMessageTextJuickWeb(String text) {
         text = text.replace("<br/>","\n");
+        text = text.replace("<br />","\n");
         text = text.replace("</div>","");
+        text = text.replace("</p>","");
+        text = text.replace("<p>","");
         while(true) {
             Matcher matcher = hyperlink.matcher(text);
             if (matcher.find()) {
@@ -222,7 +163,10 @@ public class DevJuickComMessages {
         }
         text = text.replace("&gt;",">");
         text = text.replace("&lt;","<");
-        text = text.replace("&mdash;","-");
+        text = text.replace("&quot;","\"");
+        text = text.replace("&laquo;","«");
+        text = text.replace("&raquo;","»");
+        text = text.replace("&mdash;","–");
         return text;
     }
 

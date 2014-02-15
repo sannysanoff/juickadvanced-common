@@ -42,6 +42,93 @@ public class PstoNetParser {
         PARSE_THREAD_COMMENTS
     }
 
+    static Pattern hyperlink = Pattern.compile("<a (.*?)href=\"(.*?)\"(.*?)>(.*?)</a>");
+    static Pattern blockQuote = Pattern.compile("<blockquote>(.*?)</blockquote>");
+    static Pattern italic = Pattern.compile("<i>(.*?)</i>");
+    static Pattern bold = Pattern.compile("<b>(.*?)</b>");
+    static Pattern underline = Pattern.compile("<u>(.*?)</u>");
+
+    public static String unwebMessageTextPsto(String text) {
+        text = text.replace("<br/>","\n");
+        text = text.replace("</div>","");
+        while(true) {
+            Matcher matcher = hyperlink.matcher(text);
+            if (matcher.find()) {
+                try {
+                    text = matcher.replaceFirst(matcher.group(2));
+                } catch (Exception e) {
+                    // bugs in regexp?
+                    break;
+                }
+                continue;
+            } else {
+                break;
+            }
+        }
+        //text = unjuick(text);
+        while(true) {
+            Matcher matcher = blockQuote.matcher(text);
+            if (matcher.find()) {
+                try {
+                    text = matcher.replaceFirst("> " + matcher.group(1));
+                } catch (Exception e) {
+                    // bugs in regexp?
+                    break;
+                }
+                continue;
+            } else {
+                break;
+            }
+        }
+        while(true) {
+            Matcher matcher = bold.matcher(text);
+            if (matcher.find()) {
+                try {
+                    text = matcher.replaceFirst("*" + matcher.group(1)+"*");
+                } catch (Exception e) {
+                    // bugs in regexp?
+                    break;
+                }
+                continue;
+            } else {
+                break;
+            }
+        }
+        while(true) {
+            Matcher matcher = italic.matcher(text);
+            if (matcher.find()) {
+                try {
+                    text = matcher.replaceFirst("/" + matcher.group(1)+"/");
+                } catch (Exception e) {
+                    // bugs in regexp?
+                    break;
+                }
+                continue;
+            } else {
+                break;
+            }
+        }
+        while(true) {
+            Matcher matcher = underline.matcher(text);
+            if (matcher.find()) {
+                try {
+                    text = matcher.replaceFirst("_" + matcher.group(1)+"_");
+                } catch (Exception e) {
+                    // bugs in regexp?
+                    break;
+                }
+                continue;
+            } else {
+                break;
+            }
+        }
+        text = text.replace("&gt;",">");
+        text = text.replace("&lt;","<");
+        text = text.replace("&mdash;","-");
+        return text;
+    }
+
+
     public ArrayList<JuickMessage> parseWebMessageListPure(String jsonStr, ParseMode parseMode) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         ArrayList<JuickMessage> retval = new ArrayList<JuickMessage>();
@@ -131,7 +218,7 @@ public class PstoNetParser {
                     return badRetval;
                 }
                 line = line.substring(3, line.length() - 4);
-                message.Text = DevJuickComMessages.unwebMessageText(line);
+                message.Text = unwebMessageTextPsto(line);
                 if (message.privateMessage) {
                     message.Text = "[private] " +message.Text;
                 }
