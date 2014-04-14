@@ -59,6 +59,8 @@ public class PointNetParser {
 
         Document parsed = Jsoup.parse(htmlStr);
         Elements posts = parsed.select("div");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy dd MMM HH:mm", Locale.US);
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy dd MMM HH:mm", new Locale("ru","RU"));
         for (Element post : posts) {
             String postClass = post.attr("class");
             if (postClass.equals("post") || postClass.startsWith("post ")) {
@@ -88,11 +90,14 @@ public class PointNetParser {
                     dt.append(" ");
                     dt.append(el.text());
                 }
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy dd MMM HH:mm");
                 try {
                     message.Timestamp = sdf.parse("1976 "+dt.toString().trim());
                 } catch (ParseException e) {
-                    continue;
+                    try {
+                        message.Timestamp = sdf2.parse("1976 "+dt.toString().trim());
+                    } catch (ParseException e1) {
+                        continue;
+                    }
                 }
                 Elements postEls = post.select("div[class=text-content]");
                 if (postEls.size() < 1) {
@@ -125,6 +130,20 @@ public class PointNetParser {
             }
         }
 
+        for (JuickMessage juickMessage : retval) {
+            if (juickMessage.getRID() != 0 && juickMessage.getReplyTo() != 0 && !juickMessage.Text.startsWith("@")) {
+                String uzur = null;
+                for (JuickMessage scan : retval) {
+                    if (scan.getRID() == juickMessage.getReplyTo()) {
+                        uzur = scan.User.UName;
+                        break;
+                    }
+                }
+                if (uzur != null) {
+                    juickMessage.Text = "@"+uzur+" "+juickMessage.Text;
+                }
+            }
+        }
 
         return retval;
     }
