@@ -1,10 +1,10 @@
 package com.juickadvanced.parsers;
 
 import com.juickadvanced.data.juick.JuickMessage;
+import com.juickadvanced.lang.Matcher;
+import com.juickadvanced.lang.Pattern;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class DevJuickComThread {
 

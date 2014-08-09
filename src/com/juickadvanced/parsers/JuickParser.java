@@ -1,5 +1,6 @@
 package com.juickadvanced.parsers;
 
+import com.juickadvanced.Utils;
 import com.juickadvanced.data.juick.JuickMessage;
 import com.juickadvanced.data.juick.JuickMessageID;
 import com.juickadvanced.data.juick.JuickUser;
@@ -29,12 +30,14 @@ public class JuickParser {
         if (json.has("replyto")) {
             jmsg.setReplyTo(json.getInt("replyto"));
         }
-        jmsg.Text = json.getString("body").replace("&quot;", "\"");
+        jmsg.Text = Utils.replace(json.getString("body"),"&quot;", "\"");
         jmsg.User = parseUserJSON(json.getJSONObject("user"));
 
         try {
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            if (DevJuickComMessages.sdftz != null) {
+                DevJuickComMessages.sdftz.initSDFTZ(df, "UTC");
+            }
             if (json.has("timestamp")) {
                 jmsg.Timestamp = df.parse(json.getString("timestamp"));
             } else {
@@ -46,7 +49,7 @@ public class JuickParser {
         if (json.has("tags")) {
             JSONArray tags = json.getJSONArray("tags");
             for (int n = 0; n < tags.length(); n++) {
-                jmsg.tags.add(tags.getString(n).replace("&quot;", "\""));
+                jmsg.tags.add(Utils.replace(tags.getString(n), "&quot;", "\""));
             }
         }
 

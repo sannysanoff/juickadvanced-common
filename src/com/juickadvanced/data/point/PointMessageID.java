@@ -13,11 +13,13 @@ import java.io.Serializable;
  */
 public class PointMessageID extends MessageID implements Serializable {
     public static final String CODE = "point";
-    String id;
+    public String id;
     public String user;
+    public int uid;
 
-    public PointMessageID(String user, String id) {
+    public PointMessageID(String user, String id, int uid) {
         this.id = id;
+        this.uid = uid;
         this.user = user;
     }
 
@@ -42,7 +44,7 @@ public class PointMessageID extends MessageID implements Serializable {
 
     public static PointMessageID fromString(String str) {
         if (str.startsWith("pnt-")) {
-            return new PointMessageID("", str.substring(4));
+            return new PointMessageID("", str.substring(4), 0);
         }
         return null;
     }

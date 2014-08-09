@@ -14,6 +14,7 @@ public class PointMessage extends JuickMessage {
 
     public String csrf_token;
     public boolean subscribed;
+    public boolean is_rec;
 
     @Override
     protected String webLinkToMessage(String msg) {

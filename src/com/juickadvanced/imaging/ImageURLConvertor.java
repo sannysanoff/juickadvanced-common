@@ -2,9 +2,6 @@ package com.juickadvanced.imaging;
 
 import com.juickadvanced.parsers.URLParser;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,7 +24,7 @@ public class ImageURLConvertor {
                 url += ".png";
             }
         }
-        if (url.contains("i.point.im")) {
+        if (url.indexOf("i.point.im") != -1) {
             URLParser parser = new URLParser(url);
             String nurl = parser.getArgsMap().get("u");
             try {

@@ -1,5 +1,7 @@
 package com.juickadvanced.parsers;
 
+import com.juickadvanced.lang.StringSplitter;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,7 +37,7 @@ public class URLParser implements Serializable {
         }
         int paramsIx = path.indexOf("?");
         if (paramsIx != -1) {
-            String[] args = path.substring(paramsIx+1).split("#")[0].split("&");
+            String[] args = StringSplitter.split(StringSplitter.split(path.substring(paramsIx + 1), "#")[0], "&");
             path = path.substring(0, paramsIx);
             for (int i=0; i<args.length; i++) {
                 String arg  = args[i];
@@ -47,7 +49,7 @@ public class URLParser implements Serializable {
                 }
             }
         } else {
-            path = path.split("#")[0];
+            path = StringSplitter.split(path, "#")[0];
         }
 	    int hashIx = url.indexOf("#");
 	    if (hashIx != -1) {

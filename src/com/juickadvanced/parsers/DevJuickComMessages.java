@@ -1,5 +1,6 @@
 package com.juickadvanced.parsers;
 
+import com.juickadvanced.Utils;
 import com.juickadvanced.data.juick.JuickMessage;
 import com.juickadvanced.data.juick.JuickMessageID;
 import com.juickadvanced.data.juick.JuickUser;
@@ -9,8 +10,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.TimeZone;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import com.juickadvanced.lang.Matcher;
+import com.juickadvanced.lang.Pattern;
+import com.juickadvanced.lang.StringSplitter;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -34,6 +37,13 @@ public class DevJuickComMessages {
     static Pattern bold = Pattern.compile("<b>(.*?)</b>");
     static Pattern underline = Pattern.compile("<u>(.*?)</u>");
 
+    public interface SDFTZ {
+        void initSDFTZ(SimpleDateFormat sdf, String tz);
+        SimpleDateFormat createSDF(String format, String l1, String l2);
+    }
+
+    public static SDFTZ sdftz;
+
     enum State {
         WAIT_MESSAGE_START,
         WAIT_MSG_TEXT,
@@ -52,16 +62,18 @@ public class DevJuickComMessages {
                 msg.setMID(new JuickMessageID(Integer.parseInt(mid)));
                 Elements t = article.select("header.t");
                 Elements userpic = article.select("aside > a > img");
-                String[] userpicArr = userpic.attr("src").split("[/\\.]");
+                String[] userpicArr = StringSplitter.split(userpic.attr("src"), "[/\\.]");
                 Elements link = t.select("a");
                 Elements time = t.select("time");
                 msg.User = new JuickUser();
-                msg.User.UName = link.attr("href").split("/")[1];
+                msg.User.UName = StringSplitter.split(link.attr("href"),"/")[1];
                 msg.User.UID = Integer.parseInt(userpicArr[6]);
                 msg.microBlogCode = JuickMessageID.CODE;
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+                    if (sdftz != null) {
+                        sdftz.initSDFTZ(sdf, "GMT");
+                    }
                     msg.Timestamp = sdf.parse(time.attr("datetime"));
                 } catch (ParseException e) {
                     continue;
@@ -85,11 +97,11 @@ public class DevJuickComMessages {
     }
 
     public static String unwebMessageTextJuickWeb(String text) {
-        text = text.replace("<br/>","\n");
-        text = text.replace("<br />","\n");
-        text = text.replace("</div>","");
-        text = text.replace("</p>","");
-        text = text.replace("<p>","");
+        text = Utils.replace(text, "<br/>","\n");
+        text = Utils.replace(text, "<br />","\n");
+        text = Utils.replace(text, "</div>","");
+        text = Utils.replace(text, "</p>","");
+        text = Utils.replace(text, "<p>","");
         while(true) {
             Matcher matcher = hyperlink.matcher(text);
             if (matcher.find()) {
@@ -161,12 +173,12 @@ public class DevJuickComMessages {
                 break;
             }
         }
-        text = text.replace("&gt;",">");
-        text = text.replace("&lt;","<");
-        text = text.replace("&quot;","\"");
-        text = text.replace("&laquo;","«");
-        text = text.replace("&raquo;","»");
-        text = text.replace("&mdash;","–");
+        text = Utils.replace(text, "&gt;",">");
+        text = Utils.replace(text, "&lt;","<");
+        text = Utils.replace(text, "&quot;","\"");
+        text = Utils.replace(text, "&laquo;","«");
+        text = Utils.replace(text, "&raquo;","»");
+        text = Utils.replace(text, "&mdash;","–");
         return text;
     }
 

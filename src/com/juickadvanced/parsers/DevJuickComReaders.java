@@ -1,10 +1,11 @@
 package com.juickadvanced.parsers;
 
 import com.juickadvanced.data.juick.JuickUser;
+import com.juickadvanced.lang.Matcher;
+import com.juickadvanced.lang.Pattern;
+import com.juickadvanced.lang.StringSplitter;
 
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -24,7 +25,7 @@ public class DevJuickComReaders {
         int ixEnd = html.indexOf("</table>");
         if (ixEnd == -1) return null;
         html = html.substring(0, ixEnd);
-        String[] lines = html.split("</td>");
+        String[] lines = StringSplitter.split(html, "</td>");
         ArrayList<JuickUser> retval = new ArrayList<JuickUser>();
         for (String line : lines) {
             Matcher matcher = userPattern.matcher(line);

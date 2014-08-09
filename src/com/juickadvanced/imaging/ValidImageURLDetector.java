@@ -22,9 +22,11 @@ public class ValidImageURLDetector {
                 urlLower = urlLower.substring(0, args);
             }
         }
-        if (urlLower.contains("img-fotki.yandex.ru/get") && urlLower.endsWith("orig"))
+        if (urlLower.indexOf("img-fotki.yandex.ru/get") >= 0 && urlLower.endsWith("orig"))
             return true;
-        if (urlLower.contains("http://commons.wikimedia.org/wiki/file:"))
+        if (urlLower.indexOf("fbcdn-sphotos") >= 0)
+            return true;
+        if (urlLower.indexOf("http://commons.wikimedia.org/wiki/file:") >= 0)
             return false;
         if (urlLower.endsWith(":large")) {
             urlLower = urlLower.substring(0, urlLower.length() - 6);

@@ -1,5 +1,7 @@
 package com.juickadvanced.xmpp;
 
+import com.juickadvanced.Utils;
+
 import java.io.Serializable;
 
 /**
@@ -27,7 +29,7 @@ public class XMPPConnectionSetup implements Serializable {
     public XMPPConnectionSetup(String jid, String password, int port, int priority, String resource, String server, boolean secure) {
         this.password = password;
         this.port = port;
-        this.jid = jid.replace(" ","");
+        this.jid = Utils.replace(jid, " ", "");
         this.priority = priority;
         this.resource = resource;
         this.server = server;
