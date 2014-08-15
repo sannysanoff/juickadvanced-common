@@ -15,7 +15,7 @@ public class JuickLoginProcedure {
     public static RESTResponse validateLoginPassword(String loginS, String passwordS, IHTTPClientService httpClientService) {
         int status = 0;
         RESTResponse result = null;
-        RESTResponse json = httpClientService.getJSON(JuickHttpAPI.getAPIURL() + "users?uname=" + loginS, null);
+        RESTResponse json = httpClientService.getJSON(JuickHttpAPI.getAPIURL() + "users?uname=" + loginS.trim(), null);
         if (json.getErrorText() != null) {
             result = new RESTResponse("Unknown username!", false, null);
         } else {
@@ -27,10 +27,10 @@ public class JuickLoginProcedure {
                 String canonicalName = (String)((JSONObject) idname.get(0)).get("uname");
                 String authStr = canonicalName + ":" + passwordS;
                 final String basicAuth = "Basic " + Base64.encodeToString(authStr.getBytes(), Base64.NO_WRAP);
-                URL apiUrl = new URL(JuickHttpAPI.getAPIURL() + "post");
+                URL apiUrl = new URL(JuickHttpAPI.getAPIURL() + "post?login_check");
                 client.setURL("POST", apiUrl.toExternalForm());
                 client.addHeader("Authorization", basicAuth);
-                client.setPostData("body=S%20*juick_advanced");
+                client.setURLEncodedPostData("body=S%20*juick_advanced");
                 IHTTPClient.Response execute = client.execute();
                 status = execute.responseCode;
                 if (status == 200) {

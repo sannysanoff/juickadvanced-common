@@ -128,7 +128,8 @@ public class PointNetParser {
         pu.UName = author.getString("login");
         pu.FullName = author.getString("name");
         pu.UID = author.getInt("id");
-        pu.avatarUrl = author.getString("avatar");
+        if (author.has("avatar") && author.get("avatar") != JSONObject.NULL)
+            pu.avatarUrl = author.getString("avatar");
         msg.Text = p.getString("text");
         String createdStr = p.getString("created");
         msg.Timestamp = parsePointAPIDate(createdStr);
@@ -157,7 +158,9 @@ public class PointNetParser {
         pu.UName = author.getString("login");
         pu.FullName = author.getString("name");
         pu.UID = author.getInt("id");
-        pu.avatarUrl = author.getString("avatar");
+        if (author.has("avatar") && author.get("avatar") != JSONObject.NULL) {
+            pu.avatarUrl = author.getString("avatar");
+        }
         msg.Text = comm.getString("text");
         msg.is_rec = comm.getBoolean("is_rec");
         msg.Timestamp = parsePointAPIDate(comm.getString("created"));

@@ -37,9 +37,6 @@ public class XMPPConnectionSetup implements Serializable {
     }
 
     public String getJid() {
-        if (jid == null) {
-            return nvl(login)+"@"+nvl(getService());
-        }
         return jid;
     }
 

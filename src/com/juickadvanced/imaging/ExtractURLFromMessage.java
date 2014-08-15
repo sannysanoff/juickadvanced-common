@@ -29,6 +29,9 @@ public class ExtractURLFromMessage {
 
         public FoundURL title; // hehehe
 
+        public String getUrl() {
+            return url;
+        }
     }
 
     public static ArrayList<FoundURL> extractUrls(String txt) {

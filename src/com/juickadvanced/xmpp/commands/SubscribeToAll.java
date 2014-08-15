@@ -7,10 +7,11 @@ package com.juickadvanced.xmpp.commands;
  * Time: 10:30 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SubscribeToAll {
+public class SubscribeToAll extends MicroblogGommand {
     public String status;   // [S],[U] from listening all stream
 
-    public SubscribeToAll(String status) {
+    public SubscribeToAll(String status, String microblogId) {
+        super(microblogId);
         this.status = status;
     }
 

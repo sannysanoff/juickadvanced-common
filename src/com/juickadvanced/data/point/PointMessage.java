@@ -1,5 +1,6 @@
 package com.juickadvanced.data.point;
 
+import com.juickadvanced.data.MessageID;
 import com.juickadvanced.data.bnw.BNWMessage;
 import com.juickadvanced.data.juick.JuickMessage;
 
@@ -21,6 +22,11 @@ public class PointMessage extends JuickMessage {
         PointMessageID mid = (PointMessageID)getMID();
         msg += "http://"+mid.user+".point.im/"+mid.getId();
         return msg;
+    }
+
+    @Override
+    public PointMessageID getMID() {
+        return (PointMessageID)super.getMID();
     }
 
 }

@@ -142,7 +142,7 @@ public class StringWriter extends Writer {
      * @since  1.5
      */
     public StringWriter append(CharSequence csq, int start, int end) {
-        CharSequence cs = (csq == null ? "null" : csq);
+        CharSequence cs = (csq == null ? new StringCharSequence("null") : csq);
         write(cs.subSequence(start, end).toString());
         return this;
     }

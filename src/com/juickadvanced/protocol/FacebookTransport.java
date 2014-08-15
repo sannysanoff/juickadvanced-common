@@ -56,7 +56,7 @@ public class FacebookTransport {
             }
             part1 = part1 + "password="+password + "&sig="+sb.toString();
             part1 = Utils.replace(part1, "@", "%40");
-            client.setPostData(part1);
+            client.setURLEncodedPostData(part1);
             client.addHeader("User-Agent", getUserAgent());
             IHTTPClient.Response content = client.execute();
             RESTResponse restResponse = Utils.streamToString(content.getStream(), null);
@@ -215,17 +215,35 @@ public class FacebookTransport {
         }
     }
 
+    public interface ReauthCallback {
+        boolean reauthorizeFacebook(FacebookTransport transport, Utils.Notification notifications);
+    }
+
+    public static ReauthCallback reauthCallback;
+
     public Feed getFirstHomeFeed(Utils.Notification notifications) throws IOException, JSONException {
         try {
-            createGraphqlRequest();
-
-            queryId = 10152793363801729L;
-            String request = "query_id="+10152793363801729L+"&method=get&query_params={\"action_location\":\"feed\",\"ad_media_type\":\"image/x-auto\",\"angora_attachment_cover_image_size\":\"720\",\"angora_attachment_profile_image_size\":\"120\",\"celebrations_profile_pic_size_param\":\"120\",\"collections_rating_pic_size_param\":\"120\",\"creative_high_img_size\":\"960\",\"creative_low_img_size\":\"320\",\"creative_med_img_size\":\"480\",\"debug_mode\":\"PRODUCTION\",\"default_image_scale\":\"1.5\",\"discovery_image_size\":\"90\",\"enable_comment_replies\":\"false\",\"first_home_story_param\":\"10\",\"friends_nearby_profile_pic_size_param\":\"80\",\"gysj_facepile_count_param\":\"4\",\"gysj_facepile_size_param\":\"60\",\"gysj_size_param\":\"90\",\"image_high_height\":\"2048\",\"image_high_width\":\"480\",\"image_large_aspect_height\":\"248\",\"image_large_aspect_width\":\"480\",\"image_low_height\":\"2048\",\"image_low_width\":\"120\",\"image_medium_height\":\"2048\",\"image_medium_width\":\"240\",\"likers_profile_image_size\":\"80\",\"media_type\":\"image/jpeg\",\"mobile_zero_upsell_size_param\":\"120\",\"num_faceboxes_and_tags\":\"50\",\"orderby_home_story_param\":\"most_recent\",\"page_review_cover_photo_size_param\":\"720\",\"place_star_survey_item_size_param\":\"120\",\"prefetch_chaining_enabled_param\":\"false\",\"presence_profile_pic_size_param\":\"60\",\"profile_image_size\":\"60\",\"profile_pic_media_type\":\"image/x-auto\",\"profile_pic_swipe_size_param\":\"320\",\"pymk_size_param\":\"320\",\"pyml_size_param\":\"80\",\"refresh_mode_param\":\"auto\",\"saved_item_pic_height\":\"320\",\"saved_item_pic_width\":\"480\",\"size_style\":\"contain-fit\"}&locale=en_US&client_country_code=SU&fb_api_req_friendly_name=NewsFeedQueryDepth2&fb_api_caller_class=com.facebook.feed.protocol.FetchNewsFeedMethod";
-            client.setPostData(request);
-            IHTTPClient.Response content = client.execute();
-            RESTResponse restResponse = Utils.streamToString(content.getStream(), notifications);
-            JSONObject response = new JSONObject(restResponse.getResult());
-            return new Feed(response);
+            while(true) {
+                createGraphqlRequest();
+                queryId = 10152793363801729L;
+                String request = "query_id="+10152793363801729L+"&method=get&query_params={\"action_location\":\"feed\",\"ad_media_type\":\"image/x-auto\",\"angora_attachment_cover_image_size\":\"720\",\"angora_attachment_profile_image_size\":\"120\",\"celebrations_profile_pic_size_param\":\"120\",\"collections_rating_pic_size_param\":\"120\",\"creative_high_img_size\":\"960\",\"creative_low_img_size\":\"320\",\"creative_med_img_size\":\"480\",\"debug_mode\":\"PRODUCTION\",\"default_image_scale\":\"1.5\",\"discovery_image_size\":\"90\",\"enable_comment_replies\":\"false\",\"first_home_story_param\":\"10\",\"friends_nearby_profile_pic_size_param\":\"80\",\"gysj_facepile_count_param\":\"4\",\"gysj_facepile_size_param\":\"60\",\"gysj_size_param\":\"90\",\"image_high_height\":\"2048\",\"image_high_width\":\"480\",\"image_large_aspect_height\":\"248\",\"image_large_aspect_width\":\"480\",\"image_low_height\":\"2048\",\"image_low_width\":\"120\",\"image_medium_height\":\"2048\",\"image_medium_width\":\"240\",\"likers_profile_image_size\":\"80\",\"media_type\":\"image/jpeg\",\"mobile_zero_upsell_size_param\":\"120\",\"num_faceboxes_and_tags\":\"50\",\"orderby_home_story_param\":\"most_recent\",\"page_review_cover_photo_size_param\":\"720\",\"place_star_survey_item_size_param\":\"120\",\"prefetch_chaining_enabled_param\":\"false\",\"presence_profile_pic_size_param\":\"60\",\"profile_image_size\":\"60\",\"profile_pic_media_type\":\"image/x-auto\",\"profile_pic_swipe_size_param\":\"320\",\"pymk_size_param\":\"320\",\"pyml_size_param\":\"80\",\"refresh_mode_param\":\"auto\",\"saved_item_pic_height\":\"320\",\"saved_item_pic_width\":\"480\",\"size_style\":\"contain-fit\"}&locale=en_US&client_country_code=SU&fb_api_req_friendly_name=NewsFeedQueryDepth2&fb_api_caller_class=com.facebook.feed.protocol.FetchNewsFeedMethod";
+                client.setURLEncodedPostData(request);
+                IHTTPClient.Response content = client.execute();
+                RESTResponse restResponse = Utils.streamToString(content.getStream(), notifications);
+                String result = restResponse.getResult();
+                JSONObject response = new JSONObject(result);
+                if (response.has("error")) {
+                    JSONObject error = response.getJSONObject("error");
+                    if (error.has("message") && error.getString("message").indexOf("Invalid OAuth access token") != -1) {
+                        if (reauthCallback != null) {
+                            if (reauthCallback.reauthorizeFacebook(this, notifications)) {
+                                continue;
+                            }
+                        }
+                    }
+                }
+                return new Feed(response);
+            }
         } finally {
             client.terminate();
         }
@@ -236,7 +254,7 @@ public class FacebookTransport {
             createGraphqlRequest();
 
             String request = "query_id=10152793363801729&method=get&query_params={\"action_location\":\"feed\",\"ad_media_type\":\"image/webp\",\"after_home_story_param\":\""+endCursor+"\",\"angora_attachment_cover_image_size\":\"720\",\"angora_attachment_profile_image_size\":\"120\",\"celebrations_profile_pic_size_param\":\"120\",\"collections_rating_pic_size_param\":\"120\",\"creative_high_img_size\":\"960\",\"creative_low_img_size\":\"320\",\"creative_med_img_size\":\"480\",\"debug_mode\":\"PRODUCTION\",\"default_image_scale\":\"1.5\",\"discovery_image_size\":\"90\",\"enable_comment_replies\":\"false\",\"first_home_story_param\":\"10\",\"friends_nearby_profile_pic_size_param\":\"80\",\"gysj_facepile_count_param\":\"4\",\"gysj_facepile_size_param\":\"60\",\"gysj_size_param\":\"90\",\"image_high_height\":\"2048\",\"image_high_width\":\"480\",\"image_large_aspect_height\":\"248\",\"image_large_aspect_width\":\"480\",\"image_low_height\":\"2048\",\"image_low_width\":\"120\",\"image_medium_height\":\"2048\",\"image_medium_width\":\"240\",\"likers_profile_image_size\":\"80\",\"media_type\":\"image/jpeg\",\"mobile_zero_upsell_size_param\":\"120\",\"num_faceboxes_and_tags\":\"50\",\"orderby_home_story_param\":\"most_recent\",\"page_review_cover_photo_size_param\":\"720\",\"place_star_survey_item_size_param\":\"120\",\"prefetch_chaining_enabled_param\":\"false\",\"presence_profile_pic_size_param\":\"60\",\"profile_image_size\":\"60\",\"profile_pic_media_type\":\"image/jpeg\",\"profile_pic_swipe_size_param\":\"320\",\"pymk_size_param\":\"320\",\"pyml_size_param\":\"80\",\"saved_item_pic_height\":\"320\",\"saved_item_pic_width\":\"480\",\"size_style\":\"contain-fit\"}&locale=en_US&client_country_code=SU&fb_api_req_friendly_name=NewsFeedQueryDepth2&fb_api_caller_class=com.facebook.feed.protocol.FetchNewsFeedMethod";
-            client.setPostData(request);
+            client.setURLEncodedPostData(request);
             IHTTPClient.Response content = client.execute();
             RESTResponse restResponse = Utils.streamToString(content.getStream(), notifications);
             JSONObject response = new JSONObject(restResponse.getResult());
@@ -283,7 +301,7 @@ public class FacebookTransport {
         try {
             createGraphqlRequest();
             String request = "query_id=10152777407321729&method=get&query_params={\"angora_attachment_cover_image_size\":\"720\",\"angora_attachment_profile_image_size\":\"120\",\"enable_comment_replies\":\"false\",\"feedback_id\":[\""+feedbackId+"\"],\"image_high_height\":\"2048\",\"image_high_width\":\"480\",\"image_low_height\":\"2048\",\"image_low_width\":\"120\",\"image_medium_height\":\"2048\",\"image_medium_width\":\"240\",\"likers_profile_image_size\":\"80\",\"max_comments\":\"25\",\"max_likers\":\"25\",\"media_type\":\"image/jpeg\",\"profile_image_size\":\"60\",\"profile_pic_media_type\":\"image/jpeg\",\"size_style\":\"contain-fit\"}&locale=en_US&client_country_code=UA&fb_api_req_friendly_name=StaticFeedbackBatchQuery&fb_api_caller_class=com.facebook.graphql.model.GraphQLFeedback";
-            client.setPostData(request);
+            client.setURLEncodedPostData(request);
             IHTTPClient.Response content = client.execute();
             InputStream strm = content.getStream();
             RESTResponse restResponse = Utils.streamToString(strm, chained);
@@ -296,7 +314,7 @@ public class FacebookTransport {
             while(comments.getJSONObject("page_info").getBoolean("has_next_page")) {
                 createGraphqlRequest();
                 request = "query_id=10152777407296729&method=get&query_params={\"after_comments\":\""+endCursor+"\",\"angora_attachment_cover_image_size\":\"720\",\"angora_attachment_profile_image_size\":\"120\",\"enable_comment_replies\":\"false\",\"feedback_id\":\""+feedbackId+"\",\"image_high_height\":\"2048\",\"image_high_width\":\"480\",\"image_low_height\":\"2048\",\"image_low_width\":\"120\",\"image_medium_height\":\"2048\",\"image_medium_width\":\"240\",\"likers_profile_image_size\":\"80\",\"max_comments\":\"25\",\"media_type\":\"image/jpeg\",\"profile_image_size\":\"60\",\"profile_pic_media_type\":\"image/jpeg\",\"size_style\":\"contain-fit\"}&locale=en_US&client_country_code=UA&fb_api_req_friendly_name=UFIFeedbackQuery&fb_api_caller_class=com.facebook.graphql.model.GraphQLFeedback";
-                client.setPostData(request);
+                client.setURLEncodedPostData(request);
                 IHTTPClient.Response resp = client.execute();
                 InputStream stream = resp.getStream();
                 restResponse = Utils.streamToString(stream, chained);
@@ -314,18 +332,6 @@ public class FacebookTransport {
         } finally {
             client.terminate();
         }
-    }
-
-
-    public static void main(String[] args) throws IOException, JSONException {
-//        String str = FileUtils.readFileToString(new File("/home/san/Work/jui/android/com.juick.android/src/com/juickadvanced/2.json"));
-//        JSONObject jo = new JSONObject(str);
-//        ArrayList<JuickMessage> juickMessages = parseJsonPure(jo);
-//        FacebookTransport facebookTransport = new FacebookTransport();
-//        facebookTransport.oauth = "CAAAAUaZA8jlABAE6Fy3tjAmhmizgQTFAuKv5l79bbAqCfbbXGySZAbp2zlZATjnJAXN4hZCJu58FFX0HK3qeh5bFtiTvZB7cwi4xDtRoLFxUnS6H0WKDvyfbZCAMDYlylNPyUUKpIIWfDgvJhqbT8p8fJldummZC1H73ZAONwenJGRWzDdxz9RP2ACfHw2yIYx0ZD";
-////        RESTResponse loginResponse = facebookTransport.performLogin("sannyspamoff@gmail.com", "sanoff28");
-//        facebookTransport.getChildren(null, "ZmVlZGJhY2s6NTc2NjM3NzA1Nzc5NDU5");
-
     }
 
 

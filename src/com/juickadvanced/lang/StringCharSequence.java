@@ -24,4 +24,9 @@ public class StringCharSequence implements CharSequence {
     public CharSequence subSequence(int start, int end) {
         return new StringCharSequence(str.substring(start, end));
     }
+
+    @Override
+    public String toString() {
+        return str;
+    }
 }

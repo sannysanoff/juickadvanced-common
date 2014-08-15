@@ -1310,7 +1310,12 @@ public final class Pattern
     /**
      * Preprocess any \Q...\E sequences in `temp', meta-quoting them.
      * See the description of `quotemeta' in perlfunc(1).
-     *//*
+     */
+
+    /**
+     * Preprocess any \Q...\E sequences in `temp', meta-quoting them.
+     * See the description of `quotemeta' in perlfunc(1).
+     */
     private void RemoveQEQuoting() {
         final int pLen = patternLength;
         int i = 0;
@@ -1358,8 +1363,17 @@ public final class Pattern
         }
 
         patternLength = j;
-        temp = Arrays.copyOf(newtemp, j + 2); // double zero termination
-    }*/
+        temp = copyOf(newtemp, j + 2); // double zero termination
+    }
+
+    public static int[] copyOf(int[] original, int newLength) {
+        int[] copy = new int[newLength];
+        System.arraycopy(original, 0, copy, 0,
+                Math.min(original.length, newLength));
+        return copy;
+    }
+
+
 
     /**
      * Copies regular expression to an int array and invokes the parsing
@@ -1384,8 +1398,7 @@ public final class Pattern
         patternLength = count;   // patternLength now in code points
 
         if (! has(LITERAL))
-            //RemoveQEQuoting();
-                throw new RuntimeException("Oops !");
+            RemoveQEQuoting();
 
         // Allocate all temporary objects here.
         buffer = new int[32];

@@ -16,6 +16,7 @@ public class ClientToServer implements Serializable {
     String sessionId;
 
     Login login;
+    LoginMultiple loginMultiple;
     RemoveSession removeSession;
     SendMessage sendMessage;
     Poll poll;
@@ -60,6 +61,13 @@ public class ClientToServer implements Serializable {
         this.login = login;
     }
 
+    public LoginMultiple getLoginMultiple() {
+        return loginMultiple;
+    }
+
+    public void setLoginMultiple(LoginMultiple loginMultiple) {
+        this.loginMultiple = loginMultiple;
+    }
 
     public Poll getPoll() {
         return poll;
