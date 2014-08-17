@@ -2,6 +2,7 @@ package com.juickadvanced.parsers;
 
 import com.juickadvanced.data.point.PointMessage;
 import com.juickadvanced.data.point.PointMessageID;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,6 +34,13 @@ public class PointNetSerializer {
         }
         JSONObject user = new JSONObject();
         jo.put("user", user);
+        JSONArray arr = new JSONArray();
+        for (String tag : pm.tags) {
+            arr.put(tag);
+        }
+        if (arr.length() > 0) {
+            jo.put("tags", arr);
+        }
         user.put("uname", pm.User.UName);
         jo.put("mb","point");
         return jo;

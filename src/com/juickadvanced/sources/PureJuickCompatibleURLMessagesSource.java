@@ -80,13 +80,19 @@ public class PureJuickCompatibleURLMessagesSource extends PureMessageSource {
     }
 
     public void fetchURLAndProcess(Utils.Notification notification, Utils.Function<Void, ArrayList<JuickMessage>> cont) {
-        final String jsonStr = httpClientService.getJSON(urlParser.getFullURL(), notification).getResult();
-        ArrayList<JuickMessage> messages = parseAndProcess(jsonStr);
-        if (messages.size() > 0) {
-            JuickMessage juickMessage = messages.get(messages.size() - 1);
-            lastRetrievedMID = ((JuickMessageID)juickMessage.getMID()).getMid();
+        String fullURL = urlParser.getFullURL();
+        RESTResponse json = httpClientService.getJSON(fullURL, notification);
+        if (json.getResult() != null) {
+            final String jsonStr = json.getResult();
+            ArrayList<JuickMessage> messages = parseAndProcess(jsonStr);
+            if (messages.size() > 0) {
+                JuickMessage juickMessage = messages.get(messages.size() - 1);
+                lastRetrievedMID = ((JuickMessageID)juickMessage.getMID()).getMid();
+            }
+            cont.apply(messages);
+        } else {
+            cont.apply(new ArrayList<JuickMessage>());
         }
-        cont.apply(messages);
     }
 
     @Override

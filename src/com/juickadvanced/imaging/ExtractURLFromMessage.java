@@ -1,5 +1,6 @@
 package com.juickadvanced.imaging;
 
+import com.juickadvanced.data.MessageID;
 import com.juickadvanced.lang.Matcher;
 import com.juickadvanced.lang.Pattern;
 import org.jsoup.helper.StringUtil;
@@ -34,7 +35,7 @@ public class ExtractURLFromMessage {
         }
     }
 
-    public static ArrayList<FoundURL> extractUrls(String txt) {
+    public static ArrayList<FoundURL> extractUrls(String txt, MessageID mid) {
         Matcher m = ExtractURLFromMessage.urlPattern.matcher(txt);
         ArrayList<FoundURL> urls = new ArrayList<FoundURL>();
         int pos = 0;
