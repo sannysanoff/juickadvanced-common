@@ -15,6 +15,9 @@ public class HTMLImageSourceDetector {
             }
             return true;
         }
+        if (url.indexOf("instagram.com/p/") != -1) {
+            return true;
+        }
         return false;
     }
 }
