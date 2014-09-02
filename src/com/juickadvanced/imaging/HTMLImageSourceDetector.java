@@ -10,7 +10,7 @@ package com.juickadvanced.imaging;
 public class HTMLImageSourceDetector {
     public static boolean isHTMLImageSource0(String url) {
         if (url.indexOf("gelbooru.com/") != -1) {
-            if (url.contains("&s=list")) {
+            if (url.indexOf("&s=list") >= 0) {
                 return false;
             }
             return true;

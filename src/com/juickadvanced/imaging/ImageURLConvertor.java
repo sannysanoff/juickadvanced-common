@@ -1,5 +1,8 @@
 package com.juickadvanced.imaging;
 
+import com.juickadvanced.parsers.URLParser;
+
+
 /**
  * Created with IntelliJ IDEA.
  * User: san
@@ -19,6 +22,16 @@ public class ImageURLConvertor {
         if (url.indexOf("gyazo.com/") != -1) {
             if (url.lastIndexOf(".") < url.length() - 10) {
                 url += ".png";
+            }
+        }
+        if (url.indexOf("i.point.im") != -1) {
+            URLParser parser = new URLParser(url);
+            String nurl = parser.getArgsMap().get("u");
+            try {
+                String retval = URIUtils.decode(nurl);
+                return retval;
+            } catch (Exception e) {
+                //
             }
         }
         if (url.indexOf("%") != -1) {

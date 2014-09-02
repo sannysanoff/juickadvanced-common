@@ -97,15 +97,19 @@ public class JuickMessage implements Serializable {
     }
 
     protected String webLinkToMessage(String msg) {
-        msg += "#"+((JuickMessageID)MID).getMid();
-        if (RID > 0) {
-            msg += "/" + RID;
+        if (MID instanceof JuickMessageID) {
+            msg += "#"+((JuickMessageID)MID).getMid();
+            if (RID > 0) {
+                msg += "/" + RID;
+            }
+            msg += " http://juick.com/" + ((JuickMessageID)MID).getMid();
+            if (RID > 0) {
+                msg += "#" + RID;
+            }
+            return msg;
+        } else {
+            return "http://example.com/"+MID.toString();
         }
-        msg += " http://juick.com/" + ((JuickMessageID)MID).getMid();
-        if (RID > 0) {
-            msg += "#" + RID;
-        }
-        return msg;
     }
 
     public MessageID getMID() {

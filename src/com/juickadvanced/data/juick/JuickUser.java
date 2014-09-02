@@ -26,7 +26,7 @@ import java.io.Serializable;
  */
 public class JuickUser implements Serializable {
 
-    public int UID = 0;
+    public long UID = 0;
     public String UName = null;
     public String FullName = null;
     boolean online;

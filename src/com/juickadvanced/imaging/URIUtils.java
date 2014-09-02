@@ -28,7 +28,7 @@ public class URIUtils {
         }
 
         // Lazily-initialized buffers.
-        StringBuilder decoded = null;
+        StringBuffer decoded = null;
         ByteArrayOutputStream out = null;
 
         int oldLength = s.length();
@@ -49,7 +49,7 @@ public class URIUtils {
                     return s;
                 } else {
                     // Append the remainder and return the decoded string.
-                    decoded.append(s, current, oldLength);
+                    decoded.append(s.substring(current, oldLength));
                     return decoded.toString();
                 }
             }
@@ -60,7 +60,7 @@ public class URIUtils {
                 // We know the new string will be shorter. Using the old length
                 // may overshoot a bit, but it will save us from resizing the
                 // buffer.
-                decoded = new StringBuilder(oldLength);
+                decoded = new StringBuffer(oldLength);
                 out = new ByteArrayOutputStream(4);
             } else {
                 // Clear decoding buffer.
@@ -69,7 +69,7 @@ public class URIUtils {
 
             // Append characters leading up to the escape.
             if (nextEscape > current) {
-                decoded.append(s, current, nextEscape);
+                decoded.append(s.substring(current, nextEscape));
 
                 current = nextEscape;
             } else {
@@ -104,11 +104,11 @@ public class URIUtils {
                 } while (current < oldLength && s.charAt(current) == '%');
 
                 // Decode UTF-8 bytes into a string and append it.
-                decoded.append(out.toString(DEFAULT_ENCODING));
+                decoded.append(out.toString());
             } catch (UnsupportedEncodingException e) {
-                throw new AssertionError(e);
+                throw new RuntimeException(e.toString());
             } catch (IOException e) {
-                throw new AssertionError(e);
+                throw new RuntimeException(e.toString());
             }
         }
 
