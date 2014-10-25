@@ -21,7 +21,7 @@ public class Utils {
         StringBuilder sb = new StringBuilder();
         long ctm = System.currentTimeMillis();
         long delta = ctm - ts;
-        if (delta > 10000) {        // probably 1976 year
+        if (delta / (24 * 60 * 60 * 1000L) > 10000L) {        // probably 1976 year
             Calendar cal = Calendar.getInstance();
             int currentYear = cal.get(Calendar.YEAR);
             cal.setTime(new Date(ts));

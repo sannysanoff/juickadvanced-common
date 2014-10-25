@@ -10,7 +10,7 @@ package com.juickadvanced.imaging;
 public class ValidImageURLDetector {
     public static boolean isValidImageURL0(String urlLower) {
         if (urlLower.indexOf("http://gyazo.com") != -1) return true;
-        if (urlLower.startsWith("http://i.point.im/")) {
+        if (urlLower.startsWith("http://i.point.im/") || urlLower.startsWith("https://i.point.im/")) {
             // dont check args
         } else {
             int args = urlLower.indexOf("?");

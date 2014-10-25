@@ -159,6 +159,7 @@ public class FacebookTransport {
                     }
                     String feedbackId = feedback.getString("id");
                     ((FacebookMessageID) msg.getMID()).feedbackId = feedbackId;
+                    msg.likers = likers;
                 }
                 if (sb.length() > 0 && sb.charAt(sb.length()-1) == '\n') {
                     sb.setLength(sb.length()-1);
@@ -197,6 +198,7 @@ public class FacebookTransport {
             msg.User.FullName = author.getString("name");
             msg.User.UName = msg.User.FullName;
             msg.Timestamp = new Date(comment.getLong("created_time")*1000L);
+            msg.likers = likers;
             if (author.has("profile_picture") && author.get("profile_picture") != JSONObject.NULL) {
                 fbuser.avatarUrl = author.getJSONObject("profile_picture").getString("uri");
             }

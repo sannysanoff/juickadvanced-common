@@ -12,6 +12,8 @@ import com.juickadvanced.data.point.PointMessageID;
  */
 public class FacebookMessage extends JuickMessage {
 
+    public long likers;
+
     public FacebookMessage() {
     }
 }

@@ -15,6 +15,9 @@ public class JuickLoginProcedure {
     public static RESTResponse validateLoginPassword(String loginS, String passwordS, IHTTPClientService httpClientService) {
         int status = 0;
         RESTResponse result = null;
+        if (loginS == null) {
+            return new RESTResponse("Empty own Juick username (?)", false, null);
+        }
         RESTResponse json = httpClientService.getJSON(JuickHttpAPI.getAPIURL() + "users?uname=" + loginS.trim(), null);
         if (json.getErrorText() != null) {
             result = new RESTResponse("Unknown username!", false, null);
