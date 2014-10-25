@@ -133,10 +133,12 @@ public class PointNetParser {
         msg.Text = p.getString("text");
         String createdStr = p.getString("created");
         msg.Timestamp = parsePointAPIDate(createdStr);
-        JSONArray tagso = p.getJSONArray("tags");
         msg.tags = new Vector<String>();
-        for(int i=0; i<tagso.length(); i++) {
-            msg.tags.add(tagso.getString(i));
+        if (p.has("tags")) {
+            JSONArray tagso = p.getJSONArray("tags");
+            for(int i=0; i<tagso.length(); i++) {
+                msg.tags.add(tagso.getString(i));
+            }
         }
         msg.setMID(new PointMessageID(pu.UName, p.getString("id"), 0));
         msg.replies = p.getInt("comments_count");
