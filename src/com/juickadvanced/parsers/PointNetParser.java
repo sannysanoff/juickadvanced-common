@@ -25,6 +25,8 @@ import java.util.*;
 
 public class PointNetParser {
 
+    public static final String HTTPS_IMG_YOUTUBE_COM_VI = "https://img.youtube.com/vi/";
+
     public static String unwebMessageTextPoint(String text) {
         text = Utils.replace(text,"<br/>","\n");
         text = Utils.replace(text,"<br />","\n");
@@ -57,7 +59,21 @@ public class PointNetParser {
         }
         while (sb.length() > 0 && sb.charAt(sb.length()-1) == '\n')
             sb.setLength(sb.length()-1);    // remove last \n
-        return sb.toString();
+        String beforeYoutube = sb.toString();
+        int ix = 0;
+        while(ix != -1) {
+            ix = beforeYoutube.indexOf(HTTPS_IMG_YOUTUBE_COM_VI, ix);
+            if (ix >= 0) {
+                ix += HTTPS_IMG_YOUTUBE_COM_VI.length();
+                int ix2 = beforeYoutube.indexOf("/", ix);
+                String key = beforeYoutube.substring(ix, ix2);
+                ix2 = beforeYoutube.indexOf(" ", ix);
+                if (ix2 == -1) ix2 = beforeYoutube.length();
+                beforeYoutube = beforeYoutube.substring(0, ix2) + " https://www.youtube.com/watch?v="+key + beforeYoutube.substring(ix2);
+                ix = ix2;
+            }
+        }
+        return beforeYoutube;
     }
 
 
@@ -185,8 +201,8 @@ public class PointNetParser {
         if (DevJuickComMessages.sdftz != null) {
             sdf = DevJuickComMessages.sdftz.createSDF("yyyy dd MMM HH:mm", "en","US");
             sdf2 = DevJuickComMessages.sdftz.createSDF("yyyy dd MMM HH:mm", "ru","RU");
-            DevJuickComMessages.sdftz.initSDFTZ(sdf2, "GMT+4");
-            DevJuickComMessages.sdftz.initSDFTZ(sdf, "GMT+4");
+            DevJuickComMessages.sdftz.initSDFTZ(sdf2, "GMT");
+            DevJuickComMessages.sdftz.initSDFTZ(sdf, "GMT");
         } else {
             sdf = new SimpleDateFormat("yyyy dd MMM HH:mm");
             sdf2 = new SimpleDateFormat("yyyy dd MMM HH:mm");
@@ -242,8 +258,16 @@ public class PointNetParser {
                 if (postEls.size() < 1) {
                     postEls = post.select("div[class=text]");
                 }
+                String referencedImages = "";
+                Elements postimg = post.select("a[class=postimg]");
+                for (Element as : postimg) {
+                    Elements imgs = as.select("img");
+                    for (Element img : imgs) {
+                        String src = img.attr("src");
+                        referencedImages += " "+src;
+                    }
+                }
                 message.csrf_token = post.select("input[name=csrf_token]").attr("value");
-
                 // last part
                 if (postEls.size() < 1) {
                     message.Text = "Error parsing text ;-(";
@@ -263,6 +287,7 @@ public class PointNetParser {
                     try {
                         message.replies = Integer.parseInt(post.select("span[class=cn]").text());
                     } catch(Exception ex){}
+                    text += referencedImages;
                     message.Text = unwebMessageTextPoint(text);
                 }
                 retval.add(message);

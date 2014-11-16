@@ -27,8 +27,12 @@ public class ImageURLConvertor {
         if (url.indexOf("i.point.im") != -1) {
             URLParser parser = new URLParser(url);
             String nurl = parser.getArgsMap().get("u");
+            if (nurl == null) nurl = url;
             try {
                 String retval = URIUtils.decode(nurl);
+                if (retval.endsWith(".thumb")) {
+                    retval = retval.substring(0, retval.length() - 6);
+                }
                 return retval;
             } catch (Exception e) {
                 //
