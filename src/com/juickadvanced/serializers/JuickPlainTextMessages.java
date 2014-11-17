@@ -1,6 +1,7 @@
 package com.juickadvanced.serializers;
 
 import com.juickadvanced.data.MessageID;
+import com.juickadvanced.data.bnw.BnwMessageID;
 import com.juickadvanced.data.juick.JuickMessageID;
 import com.juickadvanced.data.point.PointMessageID;
 
@@ -31,6 +32,9 @@ public class JuickPlainTextMessages {
         }
         if (mid instanceof JuickMessageID) {
             return "http://juick.com/"+((JuickMessageID) mid).getMid()+(rid != 0 ? "#"+rid : "") +"\n";
+        }
+        if (mid instanceof BnwMessageID) {
+            return "http://bnw.im/"+((BnwMessageID) mid).getId()+(rid != 0 ? "#"+((BnwMessageID) mid).getRidString() : "") +"\n";
         }
         if (mid instanceof PointMessageID) {
             return "http://point.im/"+((PointMessageID) mid).getId()+(rid != 0 ? "#"+rid : "")+"\n";

@@ -14,6 +14,7 @@ import java.io.Serializable;
 public class BnwMessageID extends MessageID implements Serializable {
     public static final String CODE = "bnw";
     String id;
+    String ridString;
 
     public BnwMessageID(String id) {
         this.id = id;
@@ -75,6 +76,10 @@ public class BnwMessageID extends MessageID implements Serializable {
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
 
         return true;
+    }
+
+    public String getRidString() {
+        return ridString;
     }
 
     @Override

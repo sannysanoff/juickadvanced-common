@@ -1,5 +1,6 @@
 package com.juickadvanced.data.bnw;
 
+import com.juickadvanced.data.MessageID;
 import com.juickadvanced.data.juick.JuickMessage;
 
 import java.util.ArrayList;
@@ -41,5 +42,10 @@ public class BNWMessage extends JuickMessage {
     protected String webLinkToMessage(String msg) {
         msg += "http://bnw.im/p/"+((BnwMessageID)getMID()).getId();
         return msg;
+    }
+
+    @Override
+    public BnwMessageID getMID() {
+        return (BnwMessageID)super.getMID();
     }
 }

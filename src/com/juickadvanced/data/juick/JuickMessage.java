@@ -18,6 +18,7 @@
 package com.juickadvanced.data.juick;
 
 import com.juickadvanced.data.MessageID;
+import com.juickadvanced.data.bnw.BnwMessageID;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;

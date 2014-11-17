@@ -1,5 +1,6 @@
 package com.juickadvanced.data.facebook;
 
+import com.juickadvanced.data.MessageID;
 import com.juickadvanced.data.juick.JuickMessage;
 import com.juickadvanced.data.point.PointMessageID;
 
@@ -15,5 +16,10 @@ public class FacebookMessage extends JuickMessage {
     public long likers;
 
     public FacebookMessage() {
+    }
+
+    @Override
+    public FacebookMessageID getMID() {
+        return (FacebookMessageID)super.getMID();
     }
 }

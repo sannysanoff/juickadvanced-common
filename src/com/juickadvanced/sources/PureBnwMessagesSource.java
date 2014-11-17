@@ -29,10 +29,6 @@ public class PureBnwMessagesSource extends PureMessageSource {
         super(httpClientService);
     }
 
-    public void init(String url) {
-        urlParser = new URLParser(url);
-    }
-
     @Override
     public void getFirst(Utils.Notification notification, Utils.Function<Void, ArrayList<JuickMessage>> cont) {
         page = 0;
@@ -141,7 +137,6 @@ public class PureBnwMessagesSource extends PureMessageSource {
         } else {
             cont.apply(new ArrayList<JuickMessage>());
         }
-        System.out.println("oh");
     }
 
     public static BNWMessage initFromJSON(JSONObject json) throws JSONException {
@@ -159,7 +154,7 @@ public class PureBnwMessagesSource extends PureMessageSource {
         jmsg.Timestamp = cal.getTime();
         jmsg.User = new JuickUser();
         jmsg.User.UName = json.getString("user");
-        if (json.has("replyto"))
+        if (json.has("replyto") && json.get("replyto") != JSONObject.NULL)
             jmsg.setReplyToString(json.getString("replyto"));
 
         if (json.has("tags")) {
