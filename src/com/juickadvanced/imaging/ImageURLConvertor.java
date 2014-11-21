@@ -33,6 +33,9 @@ public class ImageURLConvertor {
                 if (retval.endsWith(".thumb")) {
                     retval = retval.substring(0, retval.length() - 6);
                 }
+                if (retval.endsWith(":large")) {
+                    retval = retval.substring(0, retval.length() - 6);
+                }
                 return retval;
             } catch (Exception e) {
                 //
