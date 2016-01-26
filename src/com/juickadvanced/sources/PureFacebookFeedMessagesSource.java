@@ -6,15 +6,11 @@ import com.juickadvanced.Utils;
 import com.juickadvanced.data.MessageID;
 import com.juickadvanced.data.facebook.FacebookMessageID;
 import com.juickadvanced.data.juick.JuickMessage;
-import com.juickadvanced.parsers.PointNetParser;
-import com.juickadvanced.parsers.URLParser;
 import com.juickadvanced.protocol.FacebookTransport;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.ja.json.JSONArray;
+import org.ja.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * Created by san on 8/8/14.

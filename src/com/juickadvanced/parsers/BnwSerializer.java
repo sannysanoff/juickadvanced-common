@@ -2,13 +2,11 @@ package com.juickadvanced.parsers;
 
 import com.juickadvanced.data.bnw.BNWMessage;
 import com.juickadvanced.data.bnw.BnwMessageID;
-import com.juickadvanced.data.point.PointMessage;
-import com.juickadvanced.data.point.PointMessageID;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.juickadvanced.lang.ISimpleDateFormat;
+import org.ja.json.JSONArray;
+import org.ja.json.JSONException;
+import org.ja.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 
 /**
  * Created by san on 8/14/14.
@@ -23,11 +21,8 @@ public class BnwSerializer {
         } else {
             jo.put("mid", "bnw-"+pm.getMID().getId());
         }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        if (DevJuickComMessages.sdftz != null) {
-            DevJuickComMessages.sdftz.initSDFTZ(sdf, "GMT");
-        }
-        jo.put("timestamp", sdf.format(pm.Timestamp));
+        ISimpleDateFormat sdf = DevJuickComMessages.sdftz.createSDF("yyyy-MM-dd HH:mm:ss", "en","US","UTC");
+        jo.put("timestamp", sdf.format(pm.Timestamp.getTime()));
         if (pm.getRID() != 0) {
             jo.put("rid", pm.getRID());
             jo.put("rid_s", pm.getRIDString());

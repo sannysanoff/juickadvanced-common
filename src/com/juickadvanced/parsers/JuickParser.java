@@ -4,15 +4,12 @@ import com.juickadvanced.Utils;
 import com.juickadvanced.data.juick.JuickMessage;
 import com.juickadvanced.data.juick.JuickMessageID;
 import com.juickadvanced.data.juick.JuickUser;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.juickadvanced.lang.ISimpleDateFormat;
+import org.ja.json.JSONArray;
+import org.ja.json.JSONException;
+import org.ja.json.JSONObject;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Created by san on 4/14/14.
@@ -34,16 +31,13 @@ public class JuickParser {
         jmsg.User = parseUserJSON(json.getJSONObject("user"));
 
         try {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            if (DevJuickComMessages.sdftz != null) {
-                DevJuickComMessages.sdftz.initSDFTZ(df, "UTC");
-            }
+            ISimpleDateFormat df = DevJuickComMessages.sdftz.createSDF("yyyy-MM-dd HH:mm:ss","en","US","UTC");
             if (json.has("timestamp")) {
-                jmsg.Timestamp = df.parse(json.getString("timestamp"));
+                jmsg.Timestamp = new Date(df.parse(json.getString("timestamp")));
             } else {
                 jmsg.Timestamp = new Date();
             }
-        } catch (ParseException e) {
+        } catch (IllegalArgumentException e) {
         }
 
         if (json.has("tags")) {
@@ -89,7 +83,7 @@ public class JuickParser {
         return jmsg;
     }
 
-    public static JuickUser parseUserJSON(JSONObject json) throws JSONException {
+    public static JuickUser parseUserJSON(org.ja.json.JSONObject json) throws JSONException {
         JuickUser juser = new JuickUser();
         juser.UID = json.getInt("uid");
         juser.UName = json.getString("uname");

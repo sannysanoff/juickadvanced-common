@@ -1,19 +1,16 @@
 package com.juickadvanced.sources;
 
 import com.juickadvanced.IHTTPClientService;
-import com.juickadvanced.RESTResponse;
 import com.juickadvanced.Utils;
 import com.juickadvanced.data.MessageID;
 import com.juickadvanced.data.bnw.BNWMessage;
 import com.juickadvanced.data.bnw.BnwMessageID;
 import com.juickadvanced.data.juick.JuickMessage;
 import com.juickadvanced.data.juick.JuickUser;
-import com.juickadvanced.data.point.PointMessageID;
-import com.juickadvanced.parsers.PointNetParser;
 import com.juickadvanced.parsers.URLParser;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.ja.json.JSONArray;
+import org.ja.json.JSONException;
+import org.ja.json.JSONObject;
 
 import java.util.*;
 

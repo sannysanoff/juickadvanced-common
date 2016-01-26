@@ -5,15 +5,13 @@ import com.juickadvanced.RESTResponse;
 import com.juickadvanced.Utils;
 import com.juickadvanced.data.MessageID;
 import com.juickadvanced.data.juick.JuickMessage;
-import com.juickadvanced.data.juick.JuickMessageID;
 import com.juickadvanced.data.point.PointMessageID;
 import com.juickadvanced.parsers.DevJuickComMessages;
 import com.juickadvanced.parsers.JuickParser;
 import com.juickadvanced.parsers.PointNetParser;
 import com.juickadvanced.parsers.URLParser;
-import com.juickadvanced.protocol.JuickHttpAPI;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.ja.json.JSONArray;
+import org.ja.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,14 +120,20 @@ public class PurePointAPIMessagesSource extends PureMessageSource {
     */
     public static class PureChildrenDownloader {
         public ArrayList<JuickMessage> download(final MessageID mid, IHTTPClientService client, final Utils.Notification notifications, boolean storeSource) {
+            System.out.println("POINT BEGIN Fetch");
             String midString = ((PointMessageID)mid).getId();
             String url = "http://point.im/api/post/" + midString;
+            //String url = "http://point.im/api/post/" + "tuoeb";
             RESTResponse jsonWithRetries = client.getJSON(url, notifications);
             if (jsonWithRetries.errorText != null) {
                 return new ArrayList<JuickMessage>();
             } else {
                 String result = jsonWithRetries.result;
+                System.out.println("POINT BEGIN PARSE JSON");
+                long l = System.currentTimeMillis();
                 ArrayList<JuickMessage> messages = new PointNetParser().parseAPIPostAndReplies(result);
+                l = System.currentTimeMillis() - l;
+                System.out.println("POINT PARSE JSON("+result.length()+"): "+l);
                 return messages;
             }
         }

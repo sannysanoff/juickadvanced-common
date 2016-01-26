@@ -10,8 +10,8 @@ import com.juickadvanced.parsers.DevJuickComMessages;
 import com.juickadvanced.parsers.JuickParser;
 import com.juickadvanced.parsers.URLParser;
 import com.juickadvanced.protocol.JuickHttpAPI;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.ja.json.JSONArray;
+import org.ja.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;

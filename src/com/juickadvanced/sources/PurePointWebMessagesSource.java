@@ -56,9 +56,10 @@ public class PurePointWebMessagesSource extends PureMessageSource {
                 urlParser.setPath(""+page);
             }
         }
-        final String jsonStr = httpClientService.getJSON(urlParser.getFullURL(), notification).getResult();
-        if (jsonStr != null) {
-            ArrayList<JuickMessage> messages = new PointNetParser().parseWebMessageListPure(jsonStr);
+        final String html = httpClientService.getJSON(urlParser.getFullURL(), notification).getResult();
+        if (html != null) {
+            long l = System.currentTimeMillis();
+            ArrayList<JuickMessage> messages = new PointNetParser().parseWebMessageListPure(html);
             if (messages.size() > 0) {
                 for (Iterator<JuickMessage> iterator = messages.iterator(); iterator.hasNext(); ) {
                     JuickMessage message = iterator.next();
@@ -72,6 +73,8 @@ public class PurePointWebMessagesSource extends PureMessageSource {
                     return;
                 }
             }
+            l = System.currentTimeMillis() - l;
+            System.out.println("POINT PARSE HTML("+html.length()+"): "+l+" msec");
             cont.apply(messages);
         } else {
             // error (notified via Notification)

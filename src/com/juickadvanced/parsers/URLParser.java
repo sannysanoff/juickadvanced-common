@@ -100,7 +100,7 @@ public class URLParser implements Serializable {
                 q.append('=');
                 q.append(entry.getValue());
             }
-            sb.append(q);
+            sb.append(q.toString());
         }
 	    if (hash != null) {
 		    sb.append("#").append(hash);

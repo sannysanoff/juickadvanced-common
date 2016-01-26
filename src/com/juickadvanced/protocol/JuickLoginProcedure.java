@@ -4,8 +4,8 @@ import com.juickadvanced.IHTTPClient;
 import com.juickadvanced.IHTTPClientService;
 import com.juickadvanced.RESTResponse;
 import com.juickadvanced.lang.URL;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.ja.json.JSONArray;
+import org.ja.json.JSONObject;
 
 
 /**

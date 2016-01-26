@@ -21,7 +21,6 @@ import com.juickadvanced.data.MessageID;
 import com.juickadvanced.data.bnw.BnwMessageID;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;

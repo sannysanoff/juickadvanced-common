@@ -232,6 +232,7 @@ public class CharacterDataLatin1 extends CharacterData {
     // The A table has 256 entries for a total of 1024 bytes.
 
     static final int A[] = new int[256];
+
     static final String A_DATA =
             "\u4800\u100F\u4800\u100F\u4800\u100F\u4800\u100F\u4800\u100F\u4800\u100F\u4800"+
                     "\u100F\u4800\u100F\u4800\u100F\u5800\u400F\u5000\u400F\u5800\u400F\u6000\u400F"+
@@ -294,6 +295,8 @@ public class CharacterDataLatin1 extends CharacterData {
     static {
         { // THIS CODE WAS AUTOMATICALLY CREATED BY GenerateCharacter:
             char[] data = A_DATA.toCharArray();
+            System.out.println("A_DATA.len="+A_DATA.length());
+            System.out.println("data.len="+data.length);
 //            assert (data.length == (256 * 2));
             int i = 0, j = 0;
             while (i < (256 * 2)) {

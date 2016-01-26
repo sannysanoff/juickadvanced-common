@@ -1,16 +1,17 @@
 package com.juickadvanced.parsers;
 
 import com.juickadvanced.Utils;
-import com.juickadvanced.data.MessageID;
 import com.juickadvanced.data.juick.JuickMessage;
 import com.juickadvanced.data.juick.JuickUser;
 import com.juickadvanced.data.point.PointMessage;
 import com.juickadvanced.data.point.PointMessageID;
 import com.juickadvanced.data.point.PointUser;
+import com.juickadvanced.lang.ISimpleDateFormat;
 import com.juickadvanced.lang.StringSplitter;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.ja.json.JSONArray;
+import org.ja.json.JSONException;
+import org.ja.json.JSONObject;
+import org.ja.json.JSONTokener;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -19,8 +20,9 @@ import org.jsoup.nodes.TextNode;
 import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class PointNetParser {
@@ -76,11 +78,66 @@ public class PointNetParser {
         return beforeYoutube;
     }
 
+    static class FastStringReader extends Reader {
+        String str;
+        int ix = 0;
+        int maxlen;
+        int marked;
+
+        public FastStringReader(String str) {
+            this.str = str;
+            this.maxlen = str.length();
+        }
+
+        @Override
+        public boolean markSupported() {
+            return true;
+        }
+
+        @Override
+        public void mark(int readAheadLimit) throws IOException {
+            marked = ix;
+        }
+
+        @Override
+        public void reset() throws IOException {
+            ix = marked;
+        }
+
+        @Override
+        public int read(char[] cbuf, int off, int len) throws IOException {
+            if (len == 1) {
+                if (ix >= maxlen) return 0;
+                cbuf[off] = str.charAt(ix);
+                ix++;
+                return 1;
+            } else {
+                int remains = Math.min(len, maxlen-ix);
+                for(int i=0; i<remains; i++) {
+                    cbuf[off+i] = str.charAt(ix+i);
+                }
+                ix += remains;
+                return remains;
+            }
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (ix >= maxlen) return -1;
+            return str.charAt(ix++);
+        }
+
+        @Override
+        public void close() throws IOException {
+
+        }
+    }
+
 
     public ArrayList<JuickMessage> parseAPIPostAndReplies(String jsonStr) {
         ArrayList<JuickMessage> retval = new ArrayList<JuickMessage>();
         try {
-            JSONObject jo = new JSONObject(jsonStr);
+            JSONObject jo = new JSONObject(new JSONTokener(new FastStringReader(jsonStr)));
             JSONObject post = jo.getJSONObject("post");
             PointMessage msg = new PointMessage();
             parsePointAPIMessagePost(msg, post);
@@ -107,7 +164,7 @@ public class PointNetParser {
     public ArrayList<JuickMessage> parseAPIMessageListPure(String jsonStr) {
         ArrayList<JuickMessage> retval = new ArrayList<JuickMessage>();
         try {
-            JSONObject jo = new JSONObject(jsonStr);
+            JSONObject jo = new JSONObject(new JSONTokener(new FastStringReader(jsonStr)));
             JSONArray posts = jo.getJSONArray("posts");
             for(int i=0; i<posts.length(); i++) {
                 JSONObject post = posts.getJSONObject(i);
@@ -125,8 +182,8 @@ public class PointNetParser {
         return retval;
     }
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-    SimpleDateFormat sdfTz = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZZZZ");
+    ISimpleDateFormat sdf = DevJuickComMessages.sdftz.createSDF("yyyy-MM-dd'T'HH:mm:ss.SSS","en","US",null);
+    ISimpleDateFormat sdfTz = DevJuickComMessages.sdftz.createSDF("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZZZZ","en","US", null);
 
     private void parsePointAPIMessage(JSONObject post, PointMessage msg) throws JSONException, ParseException {
         JSONObject p = post.getJSONObject("post");
@@ -156,16 +213,27 @@ public class PointNetParser {
                 msg.tags.add(tagso.getString(i));
             }
         }
+        if (p.has("files")) {
+            JSONArray fileso = p.getJSONArray("files");
+            for(int i=0; i<fileso.length(); i++) {
+                msg.Text += "\n@\n"+fileso.getString(i);
+            }
+        }
         msg.setMID(new PointMessageID(pu.UName, p.getString("id"), 0));
         msg.replies = p.getInt("comments_count");
         msg.microBlogCode = PointMessageID.CODE;
     }
 
-    private Date parsePointAPIDate(String createdStr) throws ParseException {
+    private Date parsePointAPIDate(String createdStr) throws IllegalArgumentException {
         if (createdStr.indexOf("+") >= 0) {
-            return sdfTz.parse(createdStr);
+            return new Date(sdfTz.parse(createdStr));
         } else {
-            return sdf.parse(createdStr);
+            int ix = createdStr.indexOf(".");
+            if (ix > 0 || createdStr.length() >= ix+4) {
+                // remove last stuff from millis
+                createdStr = createdStr.substring(0, ix + 4);
+            }
+            return new Date(sdf.parse(createdStr));
         }
     }
 
@@ -196,17 +264,10 @@ public class PointNetParser {
 
         Document parsed = Jsoup.parse(htmlStr);
         Elements posts = parsed.select("div");
-        SimpleDateFormat sdf;
-        SimpleDateFormat sdf2;
-        if (DevJuickComMessages.sdftz != null) {
-            sdf = DevJuickComMessages.sdftz.createSDF("yyyy dd MMM HH:mm", "en","US");
-            sdf2 = DevJuickComMessages.sdftz.createSDF("yyyy dd MMM HH:mm", "ru","RU");
-            DevJuickComMessages.sdftz.initSDFTZ(sdf2, "GMT");
-            DevJuickComMessages.sdftz.initSDFTZ(sdf, "GMT");
-        } else {
-            sdf = new SimpleDateFormat("yyyy dd MMM HH:mm");
-            sdf2 = new SimpleDateFormat("yyyy dd MMM HH:mm");
-        }
+        ISimpleDateFormat sdf;
+        ISimpleDateFormat sdf2;
+        sdf = DevJuickComMessages.sdftz.createSDF("yyyy dd MMM HH:mm", "en","US","UTC");
+        sdf2 = DevJuickComMessages.sdftz.createSDF("yyyy dd MMM HH:mm", "ru","RU","UTC");
         Calendar cal = Calendar.getInstance();
         int currentYear = cal.get(Calendar.YEAR);
         for (Element post : posts) {
@@ -239,11 +300,11 @@ public class PointNetParser {
                     dt.append(el.text());
                 }
                 try {
-                    message.Timestamp = sdf.parse(currentYear+" "+dt.toString().trim());
-                } catch (ParseException e) {
+                    message.Timestamp = new Date(sdf.parse(currentYear+" "+dt.toString().trim()));
+                } catch (IllegalArgumentException e) {
                     try {
-                        message.Timestamp = sdf2.parse(currentYear + " "+dt.toString().trim());
-                    } catch (ParseException e1) {
+                        message.Timestamp = new Date(sdf2.parse(currentYear + " "+dt.toString().trim()));
+                    } catch (IllegalArgumentException e1) {
                         continue;
                     }
                 }

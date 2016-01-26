@@ -11,9 +11,9 @@ import com.juickadvanced.data.juick.JuickMessage;
 import com.juickadvanced.lang.MD5Digest;
 import com.juickadvanced.lang.URLDecoder;
 import com.juickadvanced.parsers.URLParser;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.ja.json.JSONArray;
+import org.ja.json.JSONException;
+import org.ja.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -4,7 +4,7 @@ import com.juickadvanced.IHTTPClient;
 import com.juickadvanced.IHTTPClientService;
 import com.juickadvanced.RESTResponse;
 import com.juickadvanced.Utils;
-import org.json.JSONObject;
+import org.ja.json.JSONObject;
 
 import java.io.InputStream;
 

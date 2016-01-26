@@ -4,20 +4,18 @@ import com.juickadvanced.Utils;
 import com.juickadvanced.data.juick.JuickMessage;
 import com.juickadvanced.data.juick.JuickMessageID;
 import com.juickadvanced.data.juick.JuickUser;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.TimeZone;
-import java.util.Vector;
-
+import com.juickadvanced.lang.ISimpleDateFormat;
 import com.juickadvanced.lang.Matcher;
 import com.juickadvanced.lang.Pattern;
 import com.juickadvanced.lang.StringSplitter;
-import org.jsoup.*;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Vector;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,8 +36,8 @@ public class DevJuickComMessages {
     static Pattern underline = Pattern.compile("<u>(.*?)</u>");
 
     public interface SDFTZ {
-        void initSDFTZ(SimpleDateFormat sdf, String tz);
-        SimpleDateFormat createSDF(String format, String l1, String l2);
+        //ISimpleDateFormat adjustSDFTZ(ISimpleDateFormat sdf, String tz);
+        ISimpleDateFormat createSDF(String format, String lang, String country, String tz);
     }
 
     public static SDFTZ sdftz;
@@ -70,12 +68,9 @@ public class DevJuickComMessages {
                 msg.User.UID = Integer.parseInt(userpicArr[6]);
                 msg.microBlogCode = JuickMessageID.CODE;
                 try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    if (sdftz != null) {
-                        sdftz.initSDFTZ(sdf, "GMT");
-                    }
-                    msg.Timestamp = sdf.parse(time.attr("datetime"));
-                } catch (ParseException e) {
+                    ISimpleDateFormat sdf = DevJuickComMessages.sdftz.createSDF("yyyy-MM-dd HH:mm:ss", "en","US","UTC");
+                    msg.Timestamp = new Date(sdf.parse(time.attr("datetime")));
+                } catch (IllegalArgumentException e) {
                     continue;
                 }
                 msg.tags = new Vector<String>();
