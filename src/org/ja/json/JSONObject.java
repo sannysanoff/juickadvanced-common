@@ -1303,6 +1303,12 @@ public class JSONObject {
         if (value instanceof Double) {
             return numberToString((Double) value);
         }
+        if (value instanceof Integer) {
+            return value.toString();
+        }
+        if (value instanceof Long) {
+            return value.toString();
+        }
         if (value instanceof Boolean || value instanceof JSONObject
                 || value instanceof JSONArray) {
             return value.toString();
@@ -1335,6 +1341,8 @@ public class JSONObject {
             writer.write(numberToString((Double) value));
         } else if (value instanceof Float) {
             writer.write(numberToString((Float) value));
+        } else if (value instanceof Integer || value instanceof Long) {
+            writer.write(value.toString());
         } else if (value instanceof Boolean) {
             writer.write(value.toString());
         } else if (value instanceof JSONString) {
