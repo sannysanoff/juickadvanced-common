@@ -104,7 +104,7 @@ public class URIUtils {
                 } while (current < oldLength && s.charAt(current) == '%');
 
                 // Decode UTF-8 bytes into a string and append it.
-                decoded.append(out.toString());
+                decoded.append(out.toString(DEFAULT_ENCODING));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e.toString());
             } catch (IOException e) {

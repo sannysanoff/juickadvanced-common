@@ -30,6 +30,9 @@ public class ImageURLConvertor {
             if (nurl == null) nurl = url;
             try {
                 String retval = URIUtils.decode(nurl);
+                if (retval.contains("%3A") || retval.contains("%D0")) {
+                    retval = URIUtils.decode(retval);
+                }
                 if (retval.endsWith(".thumb")) {
                     retval = retval.substring(0, retval.length() - 6);
                 }

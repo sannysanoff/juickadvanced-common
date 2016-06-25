@@ -1,7 +1,5 @@
 package com.juickadvanced.lang.gcp;
 
-
-
 /**
  * This class is based on java.lang.AbstractStringBuffer but
  * without the copying of the string by toString.
