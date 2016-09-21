@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class ExtractURLFromMessage {
-    public static Pattern urlPattern = Pattern.compile("((?<=\\A)|(?<=<)|(?<=\\s))(ht|f)tps?://[a-z0-9\\-\\.]+[a-z]{2,}/?[^\\s\\n>]*", Pattern.CASE_INSENSITIVE);
+    public static Pattern urlPattern = Pattern.compile("(?:(?:\\s|\\A)+|(?:\\u005B.*?\\u005D\\u0028))?((?:ht|f)tps?://[a-z0-9\\-\\.]+[a-z]{2,}/?[^\\s\\u0029>]*)", Pattern.CASE_INSENSITIVE);
 
     public static class FoundURL {
         public String url;
@@ -40,9 +40,15 @@ public class ExtractURLFromMessage {
         ArrayList<FoundURL> urls = new ArrayList<FoundURL>();
         int pos = 0;
         while (m.find(pos)) {
-            urls.add(new FoundURL(txt.substring(m.start(), m.end()), m.start(), m.end()));
+            int start = m.start();
+            while(Character.isWhitespace(txt.charAt(start))) start++;
+            if (txt.charAt(start) == '[') {
+                start = txt.indexOf("(", start)+1;
+            }
+            urls.add(new FoundURL(txt.substring(start, m.end()), start, m.end()));
             pos = m.end();
         }
+/*
         int scanOffset = 0;
 urlscan:
         while(true) {
@@ -65,6 +71,7 @@ urlscan:
             fu.title = new FoundURL(txt.substring(ix+1, ix2), ix+1, ix2);
             scanOffset = ix4+1;
         }
+*/
         return urls;
     }
 

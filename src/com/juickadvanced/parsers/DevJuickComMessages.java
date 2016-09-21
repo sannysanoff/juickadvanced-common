@@ -58,10 +58,10 @@ public class DevJuickComMessages {
                 if (mid.length() == 0) continue;
                 JuickMessage msg = new JuickMessage();
                 msg.setMID(new JuickMessageID(Integer.parseInt(mid)));
-                Elements t = article.select("header.t");
-                Elements userpic = article.select("aside > a > img");
+                Elements t = article.select("header");
+                Elements userpic = t.select("img");
                 String[] userpicArr = StringSplitter.split(userpic.attr("src"), "[/\\.]");
-                Elements link = t.select("a");
+                Elements link = t.select("div.msg-ts > a");
                 Elements time = t.select("time");
                 msg.User = new JuickUser();
                 msg.User.UName = StringSplitter.split(link.attr("href"),"/")[1];
@@ -74,7 +74,7 @@ public class DevJuickComMessages {
                     continue;
                 }
                 msg.tags = new Vector<String>();
-                Elements tags = article.select("header.u > a");
+                Elements tags = article.select("header > div.msg-tags > a");
                 for(int i=1; i<tags.size(); i++) {
                     msg.tags.add(tags.get(i).text());
                 }

@@ -15,6 +15,7 @@ import org.ja.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -76,6 +77,8 @@ public class PurePointAPIMessagesSource extends PureMessageSource {
         fetchURLAndProcess(notification, cont);
     }
 
+    HashSet<String> alreadyFetched = new HashSet<String>();
+
     protected void fetchURLAndProcess(Utils.Notification notification, Utils.Function<Void, ArrayList<JuickMessage>> cont) {
         Map<String,String> argsMap = urlParser.getArgsMap();
         if (lastMessageDownloaded == 0) {
@@ -84,20 +87,34 @@ public class PurePointAPIMessagesSource extends PureMessageSource {
             argsMap.put("before", ""+lastMessageDownloaded);
         }
         final String jsonStr = httpClientService.getJSON(urlParser.getFullURL(), notification).getResult();
+        boolean shouldFetchFurther = false;
         if (jsonStr != null) {
             ArrayList<JuickMessage> messages = new PointNetParser().parseAPIMessageListPure(jsonStr);
+            if (messages.size() > 0) {
+                PointMessageID pointMid = (PointMessageID) messages.get(messages.size() - 1).getMID();
+                lastMessageDownloaded = pointMid.uid;
+            }
             for (int i = 0; i < messages.size(); i++) {
                 JuickMessage message = messages.get(i);
-                if (((PointMessageID) message.getMID()).uid == lastMessageDownloaded) {
+                PointMessageID mid = (PointMessageID) message.getMID();
+                if (!alreadyFetched.add(mid.getId())) {
+                    shouldFetchFurther = true;
                     messages.remove(i);
                     i--;
                 }
             }
             if (messages.size() > 0) {
-                PointMessageID pointMid = (PointMessageID)messages.get(messages.size() - 1).getMID();
-                lastMessageDownloaded = pointMid.uid;
+                // got some
+                cont.apply(messages);
+            } else {
+                if (shouldFetchFurther) {
+                    // removed too much, but believe we have more
+                    fetchURLAndProcess(notification, cont);
+                } else {
+                    // true end.
+                    cont.apply(messages);
+                }
             }
-            cont.apply(messages);
         } else {
             // error (notified via Notification)
             cont.apply(new ArrayList<JuickMessage>());
