@@ -593,7 +593,12 @@ public final class Matcher implements MatchResult {
         if ((start < 0) || (start > limit))
             throw new IndexOutOfBoundsException("Illegal start index");
         reset();
-        return search(start);
+        try {
+            return search(start);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
