@@ -27,12 +27,16 @@ public class JuickParser {
         if (json.has("replyto")) {
             jmsg.setReplyTo(json.getInt("replyto"));
         }
-        jmsg.Text = Utils.replace(json.getString("body"),"&quot;", "\"");
+        if (json.has("body") && !json.isNull("body")) {
+            jmsg.Text = Utils.replace(json.getString("body"),"&quot;", "\"");
+        } else {
+            jmsg.Text = "";
+        }
         jmsg.User = parseUserJSON(json.getJSONObject("user"));
 
         try {
             ISimpleDateFormat df = DevJuickComMessages.sdftz.createSDF("yyyy-MM-dd HH:mm:ss","en","US","UTC");
-            if (json.has("timestamp")) {
+            if (json.has("timestamp") && !json.isNull("timestamp")) {
                 jmsg.Timestamp = new Date(df.parse(json.getString("timestamp")));
             } else {
                 jmsg.Timestamp = new Date();
@@ -51,25 +55,22 @@ public class JuickParser {
             jmsg.replies = json.getInt("replies");
         }
 
-        if (json.has("photo")) {
+        if (json.has("photo") && !json.isNull("photo")) {
             jmsg.Photo = json.getJSONObject("photo").getString("small");
             if (jmsg.Photo.startsWith("//")) {
                 jmsg.Photo = "http:" + jmsg.Photo;
             }
         }
-        if (json.has("video")) {
+        if (json.has("video") && !json.isNull("video")) {
             jmsg.Video = json.getJSONObject("video").getString("mp4");
             if (jmsg.Video.startsWith("//")) {
                 jmsg.Video = "http:" + jmsg.Video;
             }
         }
-        if (json.has("context_post")) {
+        if (json.has("context_post") && !json.isNull("context_post")) {
             jmsg.contextPost = initFromJSON(json.getJSONObject("context_post"));
         }
-        if (json.has("context_reply")) {
-            jmsg.contextReply = initFromJSON(json.getJSONObject("context_reply"));
-        }
-        if (json.has("context_reply")) {
+        if (json.has("context_reply") && !json.isNull("context_reply")) {
             jmsg.contextReply = initFromJSON(json.getJSONObject("context_reply"));
         }
         if (json.has("my_found_count")) {
@@ -86,8 +87,8 @@ public class JuickParser {
     public static JuickUser parseUserJSON(org.ja.json.JSONObject json) throws JSONException {
         JuickUser juser = new JuickUser();
         juser.UID = json.getInt("uid");
-        juser.UName = json.getString("uname");
-        if (json.has("fullname")) {
+        juser.UName = json.has("uname") && !json.isNull("uname") ? json.getString("uname") : "";
+        if (json.has("fullname") && !json.isNull("fullname")) {
             juser.FullName = json.getString("fullname");
         }
         return juser;
